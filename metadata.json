@@ -1,0 +1,10 @@
+{
+  "name": "VIBEX",
+  "description": "Gamified cross-platform music instrument learning platform for Piano, Guitar, Violin, and Bansuri with real-time YIN/MPM pitch tracking and multimodal AI posture evaluation.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
