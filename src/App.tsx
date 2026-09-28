@@ -4,93 +4,74 @@
  */
 
 import React, { useState } from 'react';
-import { InstrumentType, BansuriScale } from './types/vibex';
-import { BANSURI_SCALES } from './data/curriculumData';
 import { Navbar } from './components/layout/Navbar';
 import { BottomNav } from './components/layout/BottomNav';
-import { DashboardView } from './views/DashboardView';
-import { PracticeMapView } from './views/PracticeMapView';
+import { HomeView } from './views/HomeView';
+import { LearnView } from './views/LearnView';
 import { PracticeView } from './views/PracticeView';
-import { BansuriTunerModal } from './components/tuner/BansuriTunerModal';
+import { SongsView } from './views/SongsView';
+import { ProfileView } from './views/ProfileView';
+import { FullScreenLessonView } from './components/lessons/FullScreenLessonView';
+import { GuitarLesson } from './types/guitarLessons';
 
 export default function App() {
-  const [currentTab, setCurrentTab] = useState<string>('dashboard');
-  const [activeInstrument, setActiveInstrument] = useState<InstrumentType>('piano');
-  const [selectedExerciseId, setSelectedExerciseId] = useState<string | undefined>(undefined);
-  const [isTunerModalOpen, setIsTunerModalOpen] = useState<boolean>(false);
-  const [activeBansuriScale, setActiveBansuriScale] = useState<BansuriScale>(BANSURI_SCALES[0]);
+  const [currentTab, setCurrentTab] = useState<string>('home');
   const [streakCount, setStreakCount] = useState<number>(7);
-
-  const handleStartPractice = (exerciseId?: string) => {
-    setSelectedExerciseId(exerciseId);
-    setCurrentTab('practice');
-  };
-
-  const handleSelectTab = (tab: string) => {
-    if (tab === 'tuner') {
-      setIsTunerModalOpen(true);
-    } else {
-      setCurrentTab(tab);
-    }
-  };
+  const [activeFullScreenLesson, setActiveFullScreenLesson] = useState<GuitarLesson | null>(null);
 
   return (
-    <div className="min-h-screen bg-[#0D0E17] text-[#F6F4FF] flex flex-col antialiased selection:bg-[#8067FF]/30">
+    <div className="min-h-screen bg-[#0D0E17] text-[#F6F4FF] flex flex-col antialiased selection:bg-[#FF8066]/30">
       {/* Top Navbar */}
       <Navbar
         currentTab={currentTab}
-        onSelectTab={handleSelectTab}
-        activeInstrument={activeInstrument}
-        onSelectInstrument={setActiveInstrument}
+        onSelectTab={setCurrentTab}
         streakCount={streakCount}
       />
 
       {/* Main Responsive Canvas Viewport */}
       <main className="flex-1 flex justify-center w-full px-4 sm:px-6 py-6 overflow-x-hidden">
         <div className="w-full max-w-7xl">
-          {currentTab === 'dashboard' && (
-            <DashboardView
-              activeInstrument={activeInstrument}
-              onSelectInstrument={setActiveInstrument}
-              onStartPractice={handleStartPractice}
-              onOpenCurriculum={() => setCurrentTab('practice-map')}
+          {currentTab === 'home' && (
+            <HomeView
+              onNavigateToLearn={() => setCurrentTab('learn')}
+              onNavigateToPractice={() => setCurrentTab('practice')}
+              onNavigateToSongs={() => setCurrentTab('songs')}
+              onStartLesson={(lesson) => setActiveFullScreenLesson(lesson)}
               streakCount={streakCount}
             />
           )}
 
-          {currentTab === 'practice-map' && (
-            <PracticeMapView
-              activeInstrument={activeInstrument}
-              onSelectExercise={(exId) => handleStartPractice(exId)}
-              onOpenTuner={() => setIsTunerModalOpen(true)}
-              streakCount={streakCount}
-            />
-          )}
+          {currentTab === 'learn' && <LearnView />}
 
           {currentTab === 'practice' && (
             <PracticeView
-              activeInstrument={activeInstrument}
-              selectedExerciseId={selectedExerciseId}
-              onOpenTuner={() => setIsTunerModalOpen(true)}
+              onNavigateToLearn={() => setCurrentTab('learn')}
+              onNavigateToSongs={() => setCurrentTab('songs')}
             />
           )}
+
+          {currentTab === 'songs' && <SongsView />}
+
+          {currentTab === 'profile' && <ProfileView streakCount={streakCount} />}
         </div>
       </main>
 
-      {/* Dedicated Flute Scale Tuner & Calibration Modal */}
-      <BansuriTunerModal
-        isOpen={isTunerModalOpen}
-        onClose={() => setIsTunerModalOpen(false)}
-        selectedScale={activeBansuriScale}
-        onSelectScale={(scale) => setActiveBansuriScale(scale)}
-      />
+      {/* Full-Screen Lesson View (When opened from Home or Learn) */}
+      {activeFullScreenLesson && (
+        <FullScreenLessonView
+          lesson={activeFullScreenLesson}
+          onClose={() => setActiveFullScreenLesson(null)}
+          onLessonCompleted={(lessonId) => {
+            setActiveFullScreenLesson(null);
+          }}
+        />
+      )}
 
-      {/* Mobile Bottom Navigation (Shown natively on small screens < md) */}
+      {/* Mobile Bottom Navigation */}
       <div className="block md:hidden">
         <BottomNav
           currentTab={currentTab}
-          onSelectTab={handleSelectTab}
-          activeInstrument={activeInstrument}
+          onSelectTab={setCurrentTab}
         />
       </div>
     </div>

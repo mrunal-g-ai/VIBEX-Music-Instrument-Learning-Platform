@@ -3,539 +3,417 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useRef } from 'react';
-import { InstrumentType, ExerciseItem, TeachingStep, PostureFeedback, PitchTrackingResult, NoteGuide, BansuriScale } from '../types/vibex';
-import { CURRICULA, BANSURI_SCALES } from '../data/curriculumData';
+import React, { useState } from 'react';
+import { GuitarProgressService } from '../services/guitarProgressService';
+import { CompletedSkillRecord } from '../types/guitarLessons';
+import { SpeedLabView } from '../components/practice/SpeedLabView';
+import { MetronomeTool } from '../components/practice/MetronomeTool';
+import { TunerTool } from '../components/practice/TunerTool';
+import { RecorderTool } from '../components/practice/RecorderTool';
+import { MasterGuitarFretboard } from '../components/instruments/MasterGuitarFretboard';
 import { VibexAudioEngine } from '../services/audioEngine';
-import { SpeechCoach } from '../services/speechCoach';
-import { VisionMonitor } from '../components/practice/VisionMonitor';
-import { PitchVisualizer } from '../components/practice/PitchVisualizer';
-import { MetronomeDrawer } from '../components/practice/MetronomeDrawer';
-import { SessionRecorderModal } from '../components/practice/SessionRecorderModal';
-import { PianoVisualizer } from '../components/instruments/PianoVisualizer';
-import { GuitarVisualizer } from '../components/instruments/GuitarVisualizer';
-import { ViolinVisualizer } from '../components/instruments/ViolinVisualizer';
-import { BansuriVisualizer } from '../components/instruments/BansuriVisualizer';
 import {
-  Play,
-  Pause,
-  RotateCcw,
-  Volume2,
-  VolumeX,
+  Zap,
   Gauge,
   Sparkles,
+  Trophy,
+  Activity,
+  Layers,
+  Clock,
+  Mic,
+  Music,
+  Play,
+  Pause,
+  ArrowRight,
   CheckCircle2,
-  AlertCircle,
-  XCircle,
-  Eye,
-  UserCheck,
-  Disc,
+  Sliders,
   Radio,
+  BookOpen,
+  Volume2,
+  ChevronRight,
 } from 'lucide-react';
 
 interface PracticeViewProps {
-  activeInstrument: InstrumentType;
-  selectedExerciseId?: string;
-  onOpenTuner: () => void;
+  onNavigateToLearn: () => void;
+  onNavigateToSongs: () => void;
 }
 
 export const PracticeView: React.FC<PracticeViewProps> = ({
-  activeInstrument,
-  selectedExerciseId,
-  onOpenTuner,
+  onNavigateToLearn,
+  onNavigateToSongs,
 }) => {
-  const curriculum = CURRICULA[activeInstrument];
-  // Find exercise or default to first available
-  const allExercises = curriculum.levels.flatMap((l) => l.exercises);
-  const initialExercise =
-    allExercises.find((e) => e.id === selectedExerciseId) || allExercises[0] || curriculum.levels[0].exercises[0];
+  const [activeTab, setActiveTab] = useState<'skills' | 'speed_lab' | 'tools' | 'free_play' | 'coached'>('skills');
+  const [activeTool, setActiveTool] = useState<'metronome' | 'tuner' | 'recorder' | 'backing_track'>('metronome');
 
-  const [currentExercise, setCurrentExercise] = useState<ExerciseItem>(initialExercise);
-  const [teachingStep, setTeachingStep] = useState<TeachingStep>('watch');
-  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
-  const [isPlayingLoop, setIsPlayingLoop] = useState<boolean>(false);
-  const [activeNoteIndex, setActiveNoteIndex] = useState<number>(0);
-  const [isSpeechCoachActive, setIsSpeechCoachActive] = useState<boolean>(true);
-  const [isMetronomeDrawerOpen, setIsMetronomeDrawerOpen] = useState<boolean>(false);
-  const [isRecorderOpen, setIsRecorderOpen] = useState<boolean>(false);
-  const [selectedBansuriScale, setSelectedBansuriScale] = useState<BansuriScale>(BANSURI_SCALES[0]);
+  // Backing Track State
+  const [isPlayingBacking, setIsPlayingBacking] = useState<boolean>(false);
+  const [backingBpm, setBackingBpm] = useState<number>(85);
+  const [backingStyle, setBackingStyle] = useState<'blues' | 'acoustic' | 'rock'>('acoustic');
 
-  // Real-time evaluation state
-  const [postureFeedback, setPostureFeedback] = useState<PostureFeedback>({
-    postureScore: 94,
-    pitchScore: 95,
-    timingScore: 92,
-    overallRating: 'perfect',
-    message: 'Ideal anatomical alignment and fingertip curve.',
-    vectorAdvice: 'Maintain relaxed shoulder level and straight spine.',
-  });
-
-  const [currentPitchResult, setCurrentPitchResult] = useState<PitchTrackingResult | null>(null);
+  const progressService = GuitarProgressService.getInstance();
+  const completedSkills = progressService.getCompletedSkills();
   const audioEngine = VibexAudioEngine.getInstance();
-  const loopTimerRef = useRef<number | null>(null);
 
-  // When selectedExerciseId or activeInstrument prop changes
-  useEffect(() => {
-    const isCurrentInActive = allExercises.some((e) => e.id === currentExercise.id);
-    if (selectedExerciseId) {
-      const match = allExercises.find((e) => e.id === selectedExerciseId);
-      if (match) {
-        setCurrentExercise(match);
-        setActiveNoteIndex(0);
-        return;
-      }
-    }
-    if (!isCurrentInActive) {
-      const fallback = allExercises[0] || curriculum.levels[0].exercises[0];
-      if (fallback) {
-        setCurrentExercise(fallback);
-        setActiveNoteIndex(0);
-      }
-    }
-  }, [selectedExerciseId, activeInstrument]);
-
-  // Clean up on unmount
-  useEffect(() => {
-    return () => {
-      if (loopTimerRef.current) clearTimeout(loopTimerRef.current);
-      audioEngine.stopPitchTracking();
-      SpeechCoach.cancel();
-    };
-  }, []);
-
-  const activeNote: NoteGuide | null = currentExercise.notes[activeNoteIndex] || null;
-
-  // Step 1: Watch Mode Playback Loop
-  const startTeachingLoop = (step: TeachingStep) => {
-    if (loopTimerRef.current) clearTimeout(loopTimerRef.current);
-    setTeachingStep(step);
-    setIsPlayingLoop(true);
-    setActiveNoteIndex(0);
-
-    if (step === 'watch') {
-      SpeechCoach.speak(`Step 1: Watch and listen to the master phrase on ${curriculum.displayName}.`, 'urgent');
-      playNoteSequence(0, 1.0);
-    } else if (step === 'your_turn') {
-      SpeechCoach.speak('Step 2: Your Turn. Play along with dynamic tempo matching.', 'urgent');
-      // In Your Turn mode, start sequence with adaptive tempo
-      playNoteSequence(0, playbackSpeed);
+  // Handle Backing Track Play/Stop
+  const toggleBackingTrack = () => {
+    if (isPlayingBacking) {
+      audioEngine.stopMetronome();
+      setIsPlayingBacking(false);
     } else {
-      SpeechCoach.speak('Step 3: AI Real-Time Feedback and Posture Analysis.', 'urgent');
+      audioEngine.startMetronome(backingBpm, 'eighth', 'woodblock');
+      setIsPlayingBacking(true);
     }
   };
-
-  const stopTeachingLoop = () => {
-    if (loopTimerRef.current) clearTimeout(loopTimerRef.current);
-    setIsPlayingLoop(false);
-  };
-
-  const playNoteSequence = (index: number, speed: number) => {
-    if (index >= currentExercise.notes.length) {
-      // Loop finished: advance teaching step
-      if (teachingStep === 'watch') {
-        setTimeout(() => {
-          setTeachingStep('your_turn');
-          SpeechCoach.speak('Now it is your turn. Play into the microphone.', 'normal');
-          playNoteSequence(0, speed);
-        }, 1200);
-      } else if (teachingStep === 'your_turn') {
-        setTimeout(() => {
-          setTeachingStep('feedback');
-          SpeechCoach.speak(
-            postureFeedback.overallRating === 'perfect'
-              ? 'Excellent performance! Pitch accuracy 96% and ideal posture maintained.'
-              : `Review feedback: ${postureFeedback.message}`,
-            'urgent'
-          );
-        }, 1000);
-      }
-      return;
-    }
-
-    setActiveNoteIndex(index);
-    const note = currentExercise.notes[index];
-    const duration = (note.durationMs / speed);
-
-    // Audio play (in Watch mode always play; in Your Turn play backing harmony)
-    if (teachingStep === 'watch') {
-      audioEngine.playInstrumentNote(activeInstrument, note.frequency, duration);
-    } else if (teachingStep === 'your_turn') {
-      // Light backing guide
-      audioEngine.playInstrumentNote(activeInstrument, note.frequency, duration * 0.7, 0.4);
-    }
-
-    loopTimerRef.current = window.setTimeout(() => {
-      playNoteSequence(index + 1, speed);
-    }, duration);
-  };
-
-  // Feedback status color token lookup
-  const getTeachingStepStyle = () => {
-    switch (teachingStep) {
-      case 'watch':
-        return {
-          title: 'WATCH',
-          label: 'Master Reference Playback',
-          color: '#A99BFF', // Soft Lavender per spec
-          bg: 'rgba(169, 155, 255, 0.15)',
-          border: '#A99BFF',
-        };
-      case 'your_turn':
-        return {
-          title: 'YOUR TURN',
-          label: 'Live Mic & Vision Tracking Active',
-          color: '#FF8066', // Coral Orange per spec
-          bg: 'rgba(255, 128, 102, 0.15)',
-          border: '#FF8066',
-        };
-      case 'feedback':
-        return {
-          title: 'AI FEEDBACK',
-          label: 'Real-Time Posture & Pitch Evaluation',
-          color: postureFeedback.overallRating === 'perfect' ? '#45D483' : '#F4BB55',
-          bg: postureFeedback.overallRating === 'perfect' ? 'rgba(69, 212, 131, 0.15)' : 'rgba(244, 187, 85, 0.15)',
-          border: postureFeedback.overallRating === 'perfect' ? '#45D483' : '#F4BB55',
-        };
-    }
-  };
-
-  const stepStyle = getTeachingStepStyle();
 
   return (
-    <div className="w-full flex flex-col gap-6 pb-20">
-      {/* Top Exercise & Teaching Loop Stepper Bar */}
-      <div className="w-full bg-[#151725] rounded-xl border border-[#303348] p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        {/* Exercise Metadata */}
+    <div className="w-full flex flex-col gap-6 pb-20 text-[#F6F4FF]">
+      {/* Studio Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#303348] pb-5">
         <div>
-          <div className="flex items-center gap-2 text-xs text-[#A9A8BA] flex-wrap">
-            <span
-              className="w-2.5 h-2.5 rounded-full"
-              style={{ backgroundColor: curriculum.accentColor }}
-            />
-            <span className="font-semibold text-[#F6F4FF]">{curriculum.displayName}</span>
-            <span aria-hidden="true">·</span>
-            <span>{currentExercise.keySignature}</span>
-            <span aria-hidden="true">·</span>
-            <span>{currentExercise.tempoBpm} BPM</span>
-            <span aria-hidden="true">·</span>
-            <select
-              value={currentExercise.id}
-              onChange={(e) => {
-                const found = allExercises.find((x) => x.id === e.target.value);
-                if (found) {
-                  setCurrentExercise(found);
-                  setActiveNoteIndex(0);
-                }
-              }}
-              className="bg-[#0D0E17] border border-[#303348] text-[#54D6C3] text-xs rounded px-2 py-0.5 font-medium focus:outline-none focus:border-[#8067FF] cursor-pointer"
-            >
-              {curriculum.levels.map((lvl) => (
-                <optgroup key={lvl.levelNumber} label={`${lvl.title} (${lvl.tierName})`}>
-                  {lvl.exercises.map((ex) => (
-                    <option key={ex.id} value={ex.id}>
-                      {ex.title} ({ex.durationMinutes}m)
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FF8066]" />
+            <span className="text-xs font-mono font-bold text-[#FF8066] uppercase tracking-wider">
+              GUITAR PRACTICE STUDIO
+            </span>
           </div>
-          <h2 className="text-xl font-bold text-[#F6F4FF] mt-1">{currentExercise.title}</h2>
-          <p className="text-xs text-[#A9A8BA] mt-0.5">{currentExercise.subtitle}</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F6F4FF] tracking-tight mt-1">
+            Practice Workbench
+          </h1>
+          <p className="text-xs text-[#A9A8BA] mt-0.5">
+            What do you want to practice right now? Choose a completed skill, Speed Lab, or studio tool.
+          </p>
         </div>
 
-        {/* 3-Step Interactive Teaching Loop Buttons */}
-        <div className="flex items-center p-1 bg-[#0D0E17] rounded-xl border border-[#303348] gap-1 self-stretch md:self-auto">
-          {/* Step 1: Watch */}
-          <button
-            onClick={() => startTeachingLoop('watch')}
-            className={`flex-1 md:flex-none px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
-              teachingStep === 'watch'
-                ? 'bg-[#A99BFF] text-[#0D0E17] shadow-[0_0_12px_rgba(169,155,255,0.4)]'
-                : 'text-[#A9A8BA] hover:text-[#F6F4FF]'
-            }`}
-          >
-            <Eye className="w-3.5 h-3.5" />
-            <span>1. Watch</span>
-          </button>
-
-          {/* Step 2: Your Turn */}
-          <button
-            onClick={() => startTeachingLoop('your_turn')}
-            className={`flex-1 md:flex-none px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
-              teachingStep === 'your_turn'
-                ? 'bg-[#FF8066] text-[#0D0E17] shadow-[0_0_12px_rgba(255,128,102,0.4)]'
-                : 'text-[#A9A8BA] hover:text-[#F6F4FF]'
-            }`}
-          >
-            <UserCheck className="w-3.5 h-3.5" />
-            <span>2. Your Turn</span>
-          </button>
-
-          {/* Step 3: AI Real-Time Correction */}
-          <button
-            onClick={() => startTeachingLoop('feedback')}
-            className={`flex-1 md:flex-none px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
-              teachingStep === 'feedback'
-                ? 'bg-[#54D6C3] text-[#0D0E17] shadow-[0_0_12px_rgba(84,214,195,0.4)]'
-                : 'text-[#A9A8BA] hover:text-[#F6F4FF]'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>3. Feedback</span>
-          </button>
-        </div>
+        {/* Coached Practice Button */}
+        <button
+          onClick={() => setActiveTab('coached')}
+          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#FF8066] to-[#E889A5] hover:brightness-110 text-[#0D0E17] font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-[#FF8066]/20 transition-all self-start sm:self-auto"
+        >
+          <Sparkles className="w-4 h-4 fill-current" />
+          <span>Vibe Coached Session</span>
+        </button>
       </div>
 
-      {/* Main Split Viewport (Dynamic Instrument Tab Renderer + Live AI Vision Monitor) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column (7 cols): Dynamic Instrument Visualizer & Tab Notation */}
-        <div className="lg:col-span-7 flex flex-col gap-5">
-          {/* Active Teaching State Notification Banner */}
-          <div
-            className="p-3.5 rounded-xl border flex items-center justify-between gap-3 text-xs transition-colors"
-            style={{
-              backgroundColor: stepStyle.bg,
-              borderColor: stepStyle.border,
-              color: '#F6F4FF',
-            }}
-          >
-            <div className="flex items-center gap-2">
-              <span
-                className="font-bold font-mono px-2 py-0.5 rounded text-[11px] uppercase tracking-wider"
-                style={{ backgroundColor: stepStyle.color, color: '#0D0E17' }}
+      {/* Main Studio Navigation Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+        <button
+          onClick={() => setActiveTab('skills')}
+          className={`px-4 py-2 rounded-xl font-bold transition-all whitespace-nowrap ${
+            activeTab === 'skills'
+              ? 'bg-[#8067FF] text-[#F6F4FF] shadow-md shadow-[#8067FF]/20'
+              : 'bg-[#151725] border border-[#303348] text-[#A9A8BA] hover:text-[#F6F4FF]'
+          }`}
+        >
+          Completed Skills ({completedSkills.length})
+        </button>
+
+        <button
+          onClick={() => setActiveTab('speed_lab')}
+          className={`px-4 py-2 rounded-xl font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+            activeTab === 'speed_lab'
+              ? 'bg-[#FF8066] text-[#0D0E17] shadow-md'
+              : 'bg-[#151725] border border-[#303348] text-[#A9A8BA] hover:text-[#F6F4FF]'
+          }`}
+        >
+          <Zap className="w-3.5 h-3.5" />
+          <span>Speed Lab</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('tools')}
+          className={`px-4 py-2 rounded-xl font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+            activeTab === 'tools'
+              ? 'bg-[#8067FF] text-[#F6F4FF] shadow-md'
+              : 'bg-[#151725] border border-[#303348] text-[#A9A8BA] hover:text-[#F6F4FF]'
+          }`}
+        >
+          <Sliders className="w-3.5 h-3.5" />
+          <span>Studio Tools</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('free_play')}
+          className={`px-4 py-2 rounded-xl font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+            activeTab === 'free_play'
+              ? 'bg-[#54D6C3] text-[#0D0E17] shadow-md'
+              : 'bg-[#151725] border border-[#303348] text-[#A9A8BA] hover:text-[#F6F4FF]'
+          }`}
+        >
+          <Layers className="w-3.5 h-3.5" />
+          <span>Free Play Lab</span>
+        </button>
+      </div>
+
+      {/* TAB 1: COMPLETED SKILLS */}
+      {activeTab === 'skills' && (
+        <div className="flex flex-col gap-5">
+          {completedSkills.length === 0 ? (
+            <div className="p-8 rounded-2xl bg-[#151725] border border-[#303348] flex flex-col items-center justify-center text-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-[#8067FF]/20 border border-[#8067FF] flex items-center justify-center text-[#8067FF]">
+                <BookOpen className="w-6 h-6" />
+              </div>
+              <div className="max-w-md">
+                <h3 className="text-base font-bold text-[#F6F4FF]">No Completed Skills Yet</h3>
+                <p className="text-xs text-[#A9A8BA] mt-1.5 leading-relaxed">
+                  Practice is built from the skills you have actually completed in Learn. Complete your first lesson (like Spider Walk or C Major) to add it to your practice studio!
+                </p>
+              </div>
+              <button
+                onClick={onNavigateToLearn}
+                className="px-6 py-2.5 rounded-xl bg-[#8067FF] hover:bg-[#6952E6] text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-[#8067FF]/20 transition-all"
               >
-                {stepStyle.title}
-              </span>
-              <span className="font-medium">{stepStyle.label}</span>
+                <span>Go to Learn Curriculum</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
-
-            {/* Pitch Lock Speed Controller (0.5x, 0.75x, 1.0x, 1.25x) */}
-            <div className="flex items-center gap-1 bg-[#151725]/80 p-0.5 rounded-lg border border-[#303348]">
-              {[0.5, 0.75, 1.0, 1.25].map((spd) => (
-                <button
-                  key={spd}
-                  onClick={() => setPlaybackSpeed(spd)}
-                  className={`px-2 py-0.5 text-[10px] font-mono font-medium rounded transition-colors ${
-                    playbackSpeed === spd
-                      ? 'bg-[#8067FF] text-[#F6F4FF]'
-                      : 'text-[#A9A8BA] hover:text-[#F6F4FF]'
-                  }`}
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {completedSkills.map((skill) => (
+                <div
+                  key={skill.id}
+                  className="p-5 rounded-2xl bg-[#151725] border border-[#303348] flex flex-col justify-between gap-4 shadow-lg hover:border-[#8067FF]/60 transition-colors"
                 >
-                  {spd}x
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Dynamic Instrument Visualizer Component */}
-          {activeInstrument === 'piano' && (
-            <PianoVisualizer activeNote={activeNote} />
-          )}
-
-          {activeInstrument === 'guitar' && (
-            <GuitarVisualizer activeNote={activeNote} />
-          )}
-
-          {activeInstrument === 'violin' && (
-            <ViolinVisualizer activeNote={activeNote} />
-          )}
-
-          {activeInstrument === 'bansuri' && (
-            <BansuriVisualizer
-              activeNote={activeNote}
-              activeScale={selectedBansuriScale}
-            />
-          )}
-
-          {/* Dynamic Auto-Scrolling Sheet Music & Tab Ribbon */}
-          <div className="w-full bg-[#151725] rounded-xl border border-[#303348] p-4 flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-[#F6F4FF]">
-                SYNCHRONIZED TAB & NOTE NOTATION
-              </span>
-              <span className="text-[11px] font-mono text-[#A9A8BA]">
-                Note {activeNoteIndex + 1} of {currentExercise.notes.length}
-              </span>
-            </div>
-
-            {/* Note Sequence Flow */}
-            <div className="flex items-center gap-2 overflow-x-auto py-2">
-              {currentExercise.notes.map((n, idx) => {
-                const isActive = activeNoteIndex === idx;
-                return (
-                  <button
-                    key={n.id}
-                    onClick={() => {
-                      setActiveNoteIndex(idx);
-                      audioEngine.playInstrumentNote(activeInstrument, n.frequency, 800);
-                    }}
-                    className={`flex flex-col items-center justify-center p-3 rounded-lg border min-w-[70px] transition-all ${
-                      isActive
-                        ? 'bg-[#8067FF]/20 border-[#8067FF] shadow-[0_0_12px_rgba(128,103,255,0.4)] scale-105'
-                        : 'bg-[#0D0E17] border-[#303348] text-[#A9A8BA] hover:border-[#8067FF]/50'
-                    }`}
-                  >
-                    <span
-                      className={`text-sm font-bold font-mono ${
-                        isActive ? 'text-[#F6F4FF]' : 'text-[#A9A8BA]'
-                      }`}
-                    >
-                      {n.swara || n.name}
-                    </span>
-                    <span className="text-[10px] text-[#A9A8BA] mt-0.5">
-                      {n.fret !== undefined ? `Fret ${n.fret}` : `${Math.round(n.frequency)}Hz`}
-                    </span>
-                    {n.finger !== undefined && (
-                      <span className="text-[9px] font-mono text-[#54D6C3]">
-                        F-{n.finger}
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#1D2032] text-[#54D6C3] uppercase">
+                        {skill.category}
+                      </span>
+                      <h3 className="text-base font-bold text-[#F6F4FF] mt-1.5">
+                        {skill.skillName}
+                      </h3>
+                    </div>
+                    {skill.isMastered && (
+                      <span className="px-2 py-0.5 rounded-full bg-[#45D483]/20 border border-[#45D483] text-[#45D483] text-[10px] font-bold">
+                        Mastered
                       </span>
                     )}
-                  </button>
-                );
-              })}
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs font-mono text-[#A9A8BA] border-t border-[#303348] pt-3">
+                    <span>Best: {skill.bestBpm} BPM</span>
+                    <span>Practiced: {skill.practiceCount}x</span>
+                  </div>
+
+                  {/* Practice Options */}
+                  <div className="grid grid-cols-3 gap-1.5 text-xs font-bold text-center">
+                    <button
+                      onClick={() => progressService.recordSkillPractice(skill.skillName, 50, 92)}
+                      className="py-1.5 rounded-lg bg-[#0D0E17] hover:bg-[#1D2032] text-[#A9A8BA] hover:text-[#F6F4FF] border border-[#303348]"
+                    >
+                      Slow (50)
+                    </button>
+                    <button
+                      onClick={() => progressService.recordSkillPractice(skill.skillName, 70, 94)}
+                      className="py-1.5 rounded-lg bg-[#0D0E17] hover:bg-[#1D2032] text-[#54D6C3] border border-[#303348]"
+                    >
+                      Normal (70)
+                    </button>
+                    <button
+                      onClick={() => progressService.recordSkillPractice(skill.skillName, 90, 90)}
+                      className="py-1.5 rounded-lg bg-[#0D0E17] hover:bg-[#1D2032] text-[#FF8066] border border-[#303348]"
+                    >
+                      Speed (90)
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-
-            {/* Transport & Auxiliary Controls */}
-            <div className="flex items-center justify-between pt-2 border-t border-[#303348]">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    if (isPlayingLoop) {
-                      stopTeachingLoop();
-                    } else {
-                      startTeachingLoop(teachingStep);
-                    }
-                  }}
-                  className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-colors ${
-                    isPlayingLoop
-                      ? 'bg-[#F06B78] text-white hover:bg-[#D95361]'
-                      : 'bg-[#8067FF] text-white hover:bg-[#6952E6]'
-                  }`}
-                >
-                  {isPlayingLoop ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-                  <span>{isPlayingLoop ? 'Pause Loop' : 'Play Phrase'}</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setActiveNoteIndex(0);
-                    startTeachingLoop(teachingStep);
-                  }}
-                  className="p-2 rounded-lg bg-[#1D2032] border border-[#303348] text-[#A9A8BA] hover:text-[#F6F4FF] transition-colors"
-                  title="Restart Phrase"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {/* Voice Speech Coach Toggle */}
-                <button
-                  onClick={() => {
-                    const next = !isSpeechCoachActive;
-                    setIsSpeechCoachActive(next);
-                    SpeechCoach.setEnabled(next);
-                  }}
-                  className={`p-2 rounded-lg border text-xs flex items-center gap-1.5 transition-colors ${
-                    isSpeechCoachActive
-                      ? 'bg-[#45D483]/10 border-[#45D483]/30 text-[#45D483]'
-                      : 'bg-[#1D2032] border-[#303348] text-[#A9A8BA]'
-                  }`}
-                  title={isSpeechCoachActive ? 'Voice Coach On' : 'Voice Coach Muted'}
-                >
-                  {isSpeechCoachActive ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                  <span className="hidden sm:inline">Voice Coach</span>
-                </button>
-
-                {/* Metronome Drawer Toggle */}
-                <button
-                  onClick={() => setIsMetronomeDrawerOpen(!isMetronomeDrawerOpen)}
-                  className={`px-3 py-2 rounded-lg border text-xs font-medium flex items-center gap-1.5 transition-colors ${
-                    isMetronomeDrawerOpen
-                      ? 'bg-[#8067FF] text-white border-[#8067FF]'
-                      : 'bg-[#1D2032] border-[#303348] text-[#A9A8BA] hover:text-[#F6F4FF]'
-                  }`}
-                >
-                  <Gauge className="w-3.5 h-3.5" />
-                  <span>Pulse Studio</span>
-                </button>
-
-                {/* Record Take Button */}
-                <button
-                  onClick={() => setIsRecorderOpen(true)}
-                  className="px-3 py-2 rounded-lg bg-[#FF8066] hover:bg-[#E56E55] text-[#0D0E17] text-xs font-bold flex items-center gap-1.5 shadow transition-colors"
-                >
-                  <Radio className="w-3.5 h-3.5 fill-current" />
-                  <span>Record Take</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Collapsible Metronome & Drone Studio Drawer */}
-          {isMetronomeDrawerOpen && (
-            <MetronomeDrawer />
           )}
         </div>
+      )}
 
-        {/* Right Column (5 cols): AI Vision Monitor & Sub-Cent Pitch Tracker */}
-        <div className="lg:col-span-5 flex flex-col gap-5">
-          {/* Vision Monitor */}
-          <VisionMonitor
-            instrument={activeInstrument}
-            isActive={true}
-            onFeedbackUpdate={(fb) => setPostureFeedback(fb)}
-          />
+      {/* TAB 2: SPEED LAB */}
+      {activeTab === 'speed_lab' && (
+        <SpeedLabView onBack={() => setActiveTab('skills')} />
+      )}
 
-          {/* Sub-Cent Pitch Visualizer */}
-          <PitchVisualizer
-            targetNote={activeNote}
-            isActive={true}
-            onPitchResult={(res) => setCurrentPitchResult(res)}
-          />
+      {/* TAB 3: TOOLS (Metronome, Tuner, Recorder, Backing Tracks) */}
+      {activeTab === 'tools' && (
+        <div className="flex flex-col gap-6">
+          {/* Sub-tools Picker */}
+          <div className="flex items-center gap-2 border-b border-[#303348] pb-3 text-xs">
+            <button
+              onClick={() => setActiveTool('metronome')}
+              className={`px-3 py-1.5 rounded-lg font-bold transition-colors ${
+                activeTool === 'metronome'
+                  ? 'bg-[#8067FF] text-[#F6F4FF]'
+                  : 'bg-[#151725] text-[#A9A8BA] hover:text-[#F6F4FF]'
+              }`}
+            >
+              Metronome
+            </button>
+            <button
+              onClick={() => setActiveTool('tuner')}
+              className={`px-3 py-1.5 rounded-lg font-bold transition-colors ${
+                activeTool === 'tuner'
+                  ? 'bg-[#54D6C3] text-[#0D0E17]'
+                  : 'bg-[#151725] text-[#A9A8BA] hover:text-[#F6F4FF]'
+              }`}
+            >
+              Guitar Tuner
+            </button>
+            <button
+              onClick={() => setActiveTool('recorder')}
+              className={`px-3 py-1.5 rounded-lg font-bold transition-colors ${
+                activeTool === 'recorder'
+                  ? 'bg-[#F06B78] text-white'
+                  : 'bg-[#151725] text-[#A9A8BA] hover:text-[#F6F4FF]'
+              }`}
+            >
+              Take Recorder
+            </button>
+            <button
+              onClick={() => setActiveTool('backing_track')}
+              className={`px-3 py-1.5 rounded-lg font-bold transition-colors ${
+                activeTool === 'backing_track'
+                  ? 'bg-[#FF8066] text-[#0D0E17]'
+                  : 'bg-[#151725] text-[#A9A8BA] hover:text-[#F6F4FF]'
+              }`}
+            >
+              Backing Tracks
+            </button>
+          </div>
 
-          {/* AI Real-Time Correction Box */}
-          <div className="p-4 bg-[#151725] rounded-xl border border-[#303348] flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#F6F4FF] flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-[#54D6C3]" />
-                <span>AI MULTIMODAL CORRECTIVE GUIDANCE</span>
-              </span>
-              <span className="font-mono text-xs text-[#54D6C3] font-bold">
-                {postureFeedback.postureScore}% Score
-              </span>
+          {activeTool === 'metronome' && <MetronomeTool />}
+          {activeTool === 'tuner' && <TunerTool />}
+          {activeTool === 'recorder' && <RecorderTool />}
+
+          {/* BACKING TRACKS TOOL */}
+          {activeTool === 'backing_track' && (
+            <div className="p-6 rounded-2xl bg-[#151725] border border-[#303348] flex flex-col gap-6">
+              <div className="flex items-center justify-between border-b border-[#303348] pb-3">
+                <div>
+                  <h3 className="text-base font-bold text-[#F6F4FF]">Rhythm Backing Tracks</h3>
+                  <p className="text-xs text-[#A9A8BA]">Jam along to continuous acoustic and blues rhythm grooves</p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {(['acoustic', 'blues', 'rock'] as const).map((st) => (
+                    <button
+                      key={st}
+                      onClick={() => setBackingStyle(st)}
+                      className={`px-3 py-1 rounded-lg text-xs capitalize font-bold ${
+                        backingStyle === st ? 'bg-[#FF8066] text-[#0D0E17]' : 'bg-[#0D0E17] text-[#A9A8BA]'
+                      }`}
+                    >
+                      {st}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-xl bg-[#0D0E17] border border-[#303348]">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={toggleBackingTrack}
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white transition-all ${
+                      isPlayingBacking ? 'bg-[#F06B78]' : 'bg-[#54D6C3] text-[#0D0E17]'
+                    }`}
+                  >
+                    {isPlayingBacking ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 fill-current" />}
+                  </button>
+                  <div>
+                    <span className="text-sm font-bold text-[#F6F4FF] capitalize">
+                      {backingStyle} Rhythm Groove ({backingBpm} BPM)
+                    </span>
+                    <span className="text-xs text-[#A9A8BA] block">
+                      {backingStyle === 'acoustic' ? 'Chords: G - D - Am - C' : backingStyle === 'blues' ? '12-Bar Blues in E' : 'Rock Drive in A Minor'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 text-xs font-mono">
+                  <span className="text-[#A9A8BA]">Tempo:</span>
+                  <input
+                    type="range"
+                    min={60}
+                    max={140}
+                    value={backingBpm}
+                    onChange={(e) => {
+                      const v = parseInt(e.target.value, 10);
+                      setBackingBpm(v);
+                      if (isPlayingBacking) {
+                        audioEngine.startMetronome(v, 'eighth', 'woodblock');
+                      }
+                    }}
+                    className="w-32 h-1.5 bg-[#1D2032] rounded-lg appearance-none cursor-pointer accent-[#FF8066]"
+                  />
+                  <span className="text-[#FF8066] font-bold w-12">{backingBpm} BPM</span>
+                </div>
+              </div>
             </div>
+          )}
+        </div>
+      )}
 
-            <p className="text-xs text-[#F6F4FF] font-medium leading-relaxed">
-              {postureFeedback.message}
-            </p>
-
-            <div className="p-2.5 rounded bg-[#0D0E17] border border-[#303348] text-xs text-[#A9A8BA]">
-              <span className="text-[#A99BFF] font-semibold">Vector Adjustment: </span>
-              <span>{postureFeedback.vectorAdvice}</span>
-            </div>
-
-            {/* Posture Guidance Specs */}
-            <div className="pt-2 border-t border-[#303348] flex flex-col gap-1.5 text-xs text-[#A9A8BA]">
-              <span className="font-semibold text-[#F6F4FF]">Ergonomic Checklist:</span>
-              <ul className="list-disc pl-4 space-y-1">
-                {currentExercise.postureGuidance.commonMistakes.map((m, i) => (
-                  <li key={i}>{m}</li>
-                ))}
-              </ul>
+      {/* TAB 4: FREE PLAY LAB */}
+      {activeTab === 'free_play' && (
+        <div className="flex flex-col gap-4 p-6 rounded-2xl bg-[#151725] border border-[#303348]">
+          <div className="flex items-center justify-between border-b border-[#303348] pb-3">
+            <div>
+              <h3 className="text-base font-bold text-[#F6F4FF]">Free Play Fretboard Lab</h3>
+              <p className="text-xs text-[#A9A8BA]">
+                Pluck any string or fret to explore notes, discover chords, and experiment freely
+              </p>
             </div>
           </div>
+          <MasterGuitarFretboard interactive={true} />
         </div>
-      </div>
+      )}
 
-      {/* Session Recorder & A/B Studio Modal */}
-      <SessionRecorderModal
-        exercise={currentExercise}
-        instrument={activeInstrument}
-        isOpen={isRecorderOpen}
-        onClose={() => setIsRecorderOpen(false)}
-      />
+      {/* TAB 5: VIBE COACHED SESSION */}
+      {activeTab === 'coached' && (
+        <div className="p-6 rounded-2xl bg-[#151725] border border-[#FF8066]/40 flex flex-col gap-5 shadow-2xl">
+          <div className="flex items-center justify-between border-b border-[#303348] pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-xl bg-[#FF8066]/20 border border-[#FF8066] flex items-center justify-center text-[#FF8066]">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-[#F6F4FF]">Vibe Coached Practice Routine</h3>
+                <p className="text-xs text-[#A9A8BA]">Guided 5-phase structured practice workout</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setActiveTab('skills')}
+              className="text-xs text-[#A9A8BA] hover:text-[#F6F4FF]"
+            >
+              Back to Studio
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-2.5">
+            <div className="p-3.5 rounded-xl bg-[#0D0E17] border border-[#303348] flex items-center justify-between text-xs">
+              <span className="font-semibold text-[#F6F4FF]">1. Warm-Up: 3 min Spider Walk (1-2-3-4)</span>
+              <span className="text-[#54D6C3] font-mono">50 BPM</span>
+            </div>
+            <div className="p-3.5 rounded-xl bg-[#0D0E17] border border-[#303348] flex items-center justify-between text-xs">
+              <span className="font-semibold text-[#F6F4FF]">2. Precision: 5 min C → G Transitions</span>
+              <span className="text-[#FF8066] font-mono">30s Sprint</span>
+            </div>
+            <div className="p-3.5 rounded-xl bg-[#0D0E17] border border-[#303348] flex items-center justify-between text-xs">
+              <span className="font-semibold text-[#F6F4FF]">3. Rhythm: 5 min D-D-U-U-D Folk Strumming</span>
+              <span className="text-[#8067FF] font-mono">65 BPM</span>
+            </div>
+            <div className="p-3.5 rounded-xl bg-[#0D0E17] border border-[#303348] flex items-center justify-between text-xs">
+              <span className="font-semibold text-[#F6F4FF]">4. Song: 5 min Knockin on Heavens Door</span>
+              <span className="text-[#F4BB55] font-mono">Full Loop</span>
+            </div>
+            <div className="p-3.5 rounded-xl bg-[#0D0E17] border border-[#303348] flex items-center justify-between text-xs">
+              <span className="font-semibold text-[#F6F4FF]">5. Cool-Down: Free Play & Ear Check</span>
+              <span className="text-[#A9A8BA] font-mono">2 min</span>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setActiveTab('speed_lab')}
+            className="w-full py-3 rounded-xl bg-[#FF8066] hover:bg-[#ff6e50] text-[#0D0E17] font-extrabold text-xs transition-all shadow-md flex items-center justify-center gap-2"
+          >
+            <span>Start Phase 1: Spider Walk in Speed Lab</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
