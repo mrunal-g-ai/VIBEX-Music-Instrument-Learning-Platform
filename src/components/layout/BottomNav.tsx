@@ -6,25 +6,26 @@
 import React from 'react';
 import { LayoutDashboard, Map, PlayCircle, Sliders, Ear } from 'lucide-react';
 
+import { InstrumentType } from '../../types/vibex';
+
 interface BottomNavProps {
   currentTab: string;
   onSelectTab: (tab: string) => void;
+  activeInstrument?: InstrumentType;
 }
 
-export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab }) => {
+export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab, activeInstrument }) => {
   const items = [
     { id: 'dashboard', label: 'Home', icon: LayoutDashboard },
-    { id: 'curriculum', label: 'Paths', icon: Map },
-    { id: 'practice', label: 'Practice', icon: PlayCircle },
-    { id: 'tuner', label: 'Tuner', icon: Sliders },
-    { id: 'ear-gym', label: 'Ear Gym', icon: Ear },
+    { id: 'practice-map', label: 'Practice Map', icon: Map },
+    ...(activeInstrument === 'bansuri' ? [{ id: 'tuner', label: 'Flute Tuner', icon: Sliders }] : []),
   ];
 
   return (
     <nav className="fixed bottom-0 inset-x-0 z-40 bg-[#151725]/95 backdrop-blur-md border-t border-[#303348] py-1.5 px-3 flex items-center justify-around">
       {items.map((item) => {
         const Icon = item.icon;
-        const isActive = currentTab === item.id;
+        const isActive = currentTab === item.id || (item.id === 'practice-map' && currentTab === 'practice');
         return (
           <button
             key={item.id}

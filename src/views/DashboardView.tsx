@@ -101,7 +101,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             onClick={onOpenCurriculum}
             className="px-5 py-3 rounded-xl bg-[#1D2032] hover:bg-[#303348] text-[#F6F4FF] font-medium text-xs border border-[#303348] flex items-center justify-center gap-2 transition-colors"
           >
-            <span>View Full 5-Tier Path</span>
+            <span>Explore Practice Map</span>
             <ArrowRight className="w-3.5 h-3.5 text-[#A9A8BA]" />
           </button>
         </div>

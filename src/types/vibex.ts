@@ -129,3 +129,51 @@ export interface EarTrainingQuestion {
   options: { label: string; isCorrect: boolean }[];
   explanation: string;
 }
+
+export type PracticeNodeType = 'tutorial' | 'practice' | 'ear_gym' | 'boss';
+export type PracticeNodeStatus = 'locked' | 'active' | 'completed';
+
+export interface LessonTutorial {
+  id: string;
+  title: string;
+  subtitle: string;
+  durationMinutes: number;
+  summary: string;
+  videoTimestamp?: string;
+  keyTakeaways: string[];
+  visualAids?: string[];
+  postureTips: string[];
+}
+
+export interface PracticeNode {
+  id: string;
+  levelNumber: number; // 1 to 5
+  moduleId: string; // e.g., "mod-1.1"
+  moduleTitle: string; // e.g., "Module 1.1: Posture & Tuning"
+  nodeIndex: number;
+  title: string;
+  subtitle: string;
+  type: PracticeNodeType;
+  exerciseId?: string;
+  tutorialId?: string;
+  earGymQuestionId?: string;
+  durationMinutes: number;
+  xpReward: number;
+  status: PracticeNodeStatus;
+  stars?: 0 | 1 | 2 | 3;
+  accuracyScore?: number; // 0 to 100
+  bossTier?: boolean;
+  bossBadge?: string;
+  pathOffset?: number; // -1 (left), 0 (center), 1 (right) for serpentine rendering
+}
+
+export interface CurriculumModule {
+  id: string;
+  levelNumber: number;
+  title: string;
+  subtitle: string;
+  description: string;
+  tutorial: LessonTutorial;
+  practiceNodes: PracticeNode[];
+}
+

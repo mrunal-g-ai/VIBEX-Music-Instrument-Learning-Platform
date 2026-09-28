@@ -9,9 +9,8 @@ import { BANSURI_SCALES } from './data/curriculumData';
 import { Navbar } from './components/layout/Navbar';
 import { BottomNav } from './components/layout/BottomNav';
 import { DashboardView } from './views/DashboardView';
-import { CurriculumMapView } from './views/CurriculumMapView';
+import { PracticeMapView } from './views/PracticeMapView';
 import { PracticeView } from './views/PracticeView';
-import { EarTrainingGymView } from './views/EarTrainingGymView';
 import { BansuriTunerModal } from './components/tuner/BansuriTunerModal';
 
 export default function App() {
@@ -54,15 +53,17 @@ export default function App() {
               activeInstrument={activeInstrument}
               onSelectInstrument={setActiveInstrument}
               onStartPractice={handleStartPractice}
-              onOpenCurriculum={() => setCurrentTab('curriculum')}
+              onOpenCurriculum={() => setCurrentTab('practice-map')}
               streakCount={streakCount}
             />
           )}
 
-          {currentTab === 'curriculum' && (
-            <CurriculumMapView
+          {currentTab === 'practice-map' && (
+            <PracticeMapView
               activeInstrument={activeInstrument}
               onSelectExercise={(exId) => handleStartPractice(exId)}
+              onOpenTuner={() => setIsTunerModalOpen(true)}
+              streakCount={streakCount}
             />
           )}
 
@@ -71,12 +72,6 @@ export default function App() {
               activeInstrument={activeInstrument}
               selectedExerciseId={selectedExerciseId}
               onOpenTuner={() => setIsTunerModalOpen(true)}
-            />
-          )}
-
-          {currentTab === 'ear-gym' && (
-            <EarTrainingGymView
-              onAddXp={(xp) => setStreakCount((prev) => prev)}
             />
           )}
         </div>
@@ -95,6 +90,7 @@ export default function App() {
         <BottomNav
           currentTab={currentTab}
           onSelectTab={handleSelectTab}
+          activeInstrument={activeInstrument}
         />
       </div>
     </div>

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { InstrumentCurriculum, BansuriScale, EarTrainingQuestion } from '../types/vibex';
+import { InstrumentCurriculum, BansuriScale, EarTrainingQuestion, PracticeNode, CurriculumModule, LessonTutorial, InstrumentType } from '../types/vibex';
 
 export const BANSURI_SCALES: BansuriScale[] = [
   { id: 'c-medium', name: 'C Medium (Kafi Thaat)', basePitchName: 'C4', baseFrequency: 261.63, type: 'Medium', lengthInches: 19 },
@@ -662,295 +662,523 @@ export const CURRICULA: Record<string, InstrumentCurriculum> = {
     tagline: 'Fretboard spatial mastery, arched fingertip clarity, and dynamic strumming rhythm',
     accentColor: '#FF8066',
     focusAreas: [
-      'Fretboard navigation & fret wire proximity',
-      'Fingertip pressure & perpendicular knuckle arch',
-      'Primary & advanced open chord shapes',
-      'F-shape & B-shape barre chords',
-      'Strumming patterns & syncopated accents',
-      'Travis picking & fingerstyle mechanics',
-      'Minor pentatonic boxes & modal soloing',
+      'Posture, ergonomics & thumb alignment behind neck',
+      'Open string tuning verification (E2-A2-D3-G3-B3-E4)',
+      'Primary open chords (Em, Am, C, G, D, Maj7, E)',
+      'Knuckle arch & fret wire proximity tracking',
+      'Syncopated strumming (Down-Down-Up-Up-Down-Up)',
+      'Minor Pentatonic Box 1 & alternate picking',
+      'F-shape & B-shape movable barre chords',
+      'Travis fingerstyle (P-I-M-A) & percussive palm muting',
+      'CAGED system & top-3 string triad inversions',
+      'Pitch bending accuracy & modal soloing (Dorian / Mixolydian)',
+      'Sweeping, two-handed tapping & concert solo evaluation',
     ],
     levels: [
+      // ---------------------------------------------------------------------
+      // LEVEL 1: ABSOLUTE BEGINNER (FOUNDATIONS & OPEN CHORDS)
+      // ---------------------------------------------------------------------
       {
         levelNumber: 1,
-        title: 'Tier 1: Absolute Beginner',
+        title: 'Level 1: Absolute Beginner',
         tierName: 'Absolute Beginner',
         durationSpan: 'Weeks 1–4',
         dailyPracticeMinutes: '30–45 min/day',
-        focusSummary: 'Instrument hold, open string tuning, primary open chords (E minor, A minor, C major), basic down-strumming rhythm.',
-        outcome: 'Hold guitar comfortably, play Em, Am, C, G, D chords cleanly, and strum 4/4 songs without pause.',
+        focusSummary: 'Posture & ergonomics, 6-string open tuning, right-hand downstroke rhythm, first chord triad (Em, Am, C), and 4-beat transitions.',
+        outcome: 'Verify open string tuning via pitch tracking, hold guitar with proper thumb placement, and perform 8-bar strumming transitions between Em, Am, and C at 70 BPM.',
         accentColor: '#FF8066',
         requiredXp: 0,
         unlocked: true,
         completed: true,
         completionPercent: 100,
         dailyRoutine: [
-          { activity: 'Spider walk finger independence (frets 1-2-3-4)', minutes: 5 },
-          { activity: 'Open string plucking (E-A-D-G-B-E)', minutes: 5 },
-          { activity: 'Open chords (Em, Am, C, G, D)', minutes: 15 },
-          { activity: 'Song practice: Knockin on Heaven’s Door', minutes: 15 },
+          { activity: 'Seating posture & thumb position check', minutes: 5 },
+          { activity: 'Open string tuning verification (E-A-D-G-B-E)', minutes: 5 },
+          { activity: 'Downstroke quarter notes at 60 BPM', minutes: 10 },
+          { activity: 'Chord arch & 4-beat switch: Em -> Am -> C', minutes: 15 },
         ],
         repertoireMilestones: [
-          { title: 'Knockin on Heaven’s Door (G–D–Am / Em)', artistOrComposer: 'Bob Dylan', type: 'Contemporary/Pop', keyOrRaga: 'G Major', tempoBpm: 65 },
-          { title: 'Horse with No Name (Em–D6)', artistOrComposer: 'America', type: 'Contemporary/Pop', keyOrRaga: 'E Minor', tempoBpm: 72 },
-          { title: 'Tum Hi Ho (Simplified Em–C–G–D)', artistOrComposer: 'Aashiqui 2', type: 'Indian/Hindi', keyOrRaga: 'E Minor', tempoBpm: 66 },
+          { title: 'Level 1 Boss: 8-Bar Open Strumming Track', artistOrComposer: 'VIBEX Rhythm Lab', type: 'Contemporary/Pop', keyOrRaga: 'E Minor / C Major', tempoBpm: 70 },
+          { title: 'Horse with No Name (Em - D6)', artistOrComposer: 'America', type: 'Contemporary/Pop', keyOrRaga: 'E Minor', tempoBpm: 68 },
+          { title: 'Tum Hi Ho (Simplified Em-C-G-D)', artistOrComposer: 'Aashiqui 2', type: 'Indian/Hindi', keyOrRaga: 'E Minor', tempoBpm: 66 },
         ],
         exercises: [
           {
-            id: 'guitar-t1-ex1',
-            title: 'Spider Walk (1-2-3-4 Finger Independence Drill)',
-            subtitle: 'Place fingers 1, 2, 3, 4 on frets 1, 2, 3, 4 across all 6 strings',
+            id: 'guitar-l1-ex1',
+            title: 'Open String Tuning & Downstroke Quarter-Notes',
+            subtitle: 'Module 1.1: E2-A2-D3-G3-B3-E4 pitch verification and 60 BPM downstroke rhythm',
             durationMinutes: 6,
             difficulty: 1,
-            goal: 'Build individual finger control without lifting earlier fingers prematurely.',
+            goal: 'Pluck each open string in tune and execute steady downstrokes on beats 1, 2, 3, 4.',
             category: 'technique',
             tempoBpm: 60,
             timeSignature: '4/4',
-            keySignature: 'Chromatic',
+            keySignature: 'Standard Tuning (EADGBE)',
             notes: [
-              { id: 'g-t1-1', name: 'F1', frequency: 87.31, durationMs: 800, fret: 1, stringIndex: 0, finger: 1, startTimeMs: 0 },
-              { id: 'g-t1-2', name: 'F#1', frequency: 92.50, durationMs: 800, fret: 2, stringIndex: 0, finger: 2, startTimeMs: 800 },
-              { id: 'g-t1-3', name: 'G1', frequency: 98.00, durationMs: 800, fret: 3, stringIndex: 0, finger: 3, startTimeMs: 1600 },
-              { id: 'g-t1-4', name: 'G#1', frequency: 103.83, durationMs: 800, fret: 4, stringIndex: 0, finger: 4, startTimeMs: 2400 },
+              { id: 'g-l1-1', name: 'E2', frequency: 82.41, durationMs: 1000, fret: 0, stringIndex: 0, finger: 0, startTimeMs: 0 },
+              { id: 'g-l1-2', name: 'A2', frequency: 110.00, durationMs: 1000, fret: 0, stringIndex: 1, finger: 0, startTimeMs: 1000 },
+              { id: 'g-l1-3', name: 'D3', frequency: 146.83, durationMs: 1000, fret: 0, stringIndex: 2, finger: 0, startTimeMs: 2000 },
+              { id: 'g-l1-4', name: 'G3', frequency: 196.00, durationMs: 1000, fret: 0, stringIndex: 3, finger: 0, startTimeMs: 3000 },
+              { id: 'g-l1-5', name: 'B3', frequency: 246.94, durationMs: 1000, fret: 0, stringIndex: 4, finger: 0, startTimeMs: 4000 },
+              { id: 'g-l1-6', name: 'E4', frequency: 329.63, durationMs: 1000, fret: 0, stringIndex: 5, finger: 0, startTimeMs: 5000 },
             ],
             postureGuidance: {
-              ideal: 'Thumb rests flat behind the neck opposite fret 2. Keep fingers arched like claws.',
-              commonMistakes: ['Thumb wrapping completely over neck choking movement', 'Fingers collapsing flat on neighboring strings'],
-              correctiveTip: 'Arch proximal knuckles 90 degrees to fret with pure tip pads.'
+              ideal: 'Sit upright, guitar body on leg with neck angled slightly upward (~30 degrees). Thumb centered behind neck.',
+              commonMistakes: ['Thumb wrapping over neck and tilting palm flat', 'Slouching over soundboard'],
+              correctiveTip: 'Keep thumb pad lightly on the centerline of the neck; keep wrist straight.'
             }
           },
           {
-            id: 'guitar-t1-ex2',
-            title: 'Open E Minor to C Major Cadence',
-            subtitle: 'Smooth two-finger pivot into 3-finger C chord',
+            id: 'guitar-l1-ex2',
+            title: 'First Open Chord Triad: Em, Am, and C Major',
+            subtitle: 'Module 1.2: Knuckle arch check & 4-beat transitions (Em -> Am -> C -> Em)',
             durationMinutes: 10,
             difficulty: 1,
-            goal: 'Switch between Em and C in under 1 beat without breaking strum tempo.',
+            goal: 'Form Em, Am, and C with arched knuckles and switch chords cleanly on beat 1.',
             category: 'chords_triads',
             tempoBpm: 65,
             timeSignature: '4/4',
-            keySignature: 'E Minor',
+            keySignature: 'E Minor / C Major',
             notes: [
-              { id: 'g-t1-5', name: 'E2', frequency: 82.41, durationMs: 1000, fret: 0, stringIndex: 0, finger: 0, startTimeMs: 0 },
-              { id: 'g-t1-6', name: 'B2', frequency: 123.47, durationMs: 1000, fret: 2, stringIndex: 1, finger: 1, startTimeMs: 1000 },
-              { id: 'g-t1-7', name: 'E3', frequency: 164.81, durationMs: 1000, fret: 2, stringIndex: 2, finger: 2, startTimeMs: 2000 },
-              { id: 'g-t1-8', name: 'C4', frequency: 261.63, durationMs: 2000, fret: 1, stringIndex: 4, finger: 1, startTimeMs: 3000 },
+              { id: 'g-l1-7', name: 'Em Chord (E2-B2-E3-G3)', frequency: 82.41, durationMs: 2000, fret: 2, stringIndex: 1, finger: 2, startTimeMs: 0 },
+              { id: 'g-l1-8', name: 'Am Chord (A2-E3-A3-C4)', frequency: 110.00, durationMs: 2000, fret: 1, stringIndex: 4, finger: 1, startTimeMs: 2000 },
+              { id: 'g-l1-9', name: 'C Major (C3-E3-G3-C4)', frequency: 130.81, durationMs: 2000, fret: 3, stringIndex: 1, finger: 3, startTimeMs: 4000 },
+              { id: 'g-l1-10', name: 'Em Resolution', frequency: 82.41, durationMs: 2000, fret: 0, stringIndex: 0, finger: 0, startTimeMs: 6000 },
             ],
             postureGuidance: {
-              ideal: 'Keep middle finger close to string 4 as an anchor when pivoting to C major.',
-              commonMistakes: ['Lifting entire fretting hand into the air when switching chords', 'Muting high E string with ring finger'],
-              correctiveTip: 'Move index finger right behind fret wire 1 on string 2 (B string).'
+              ideal: 'Proximal and distal knuckles arched like a claw. Fingertips press perpendicularly right behind frets.',
+              commonMistakes: ['Flat finger pads muting adjacent open strings', 'Pinky flying far away in tension'],
+              correctiveTip: 'Arch index and middle fingers so the high E and B strings ring completely unobstructed.'
+            }
+          },
+          {
+            id: 'guitar-l1-boss',
+            title: 'Practice Node 1 Boss: 8-Bar Open Chord Strum Track',
+            subtitle: 'Module 1.3: Continuous rhythm performance of Em, Am, and C at 70 BPM',
+            durationMinutes: 12,
+            difficulty: 2,
+            goal: 'Perform complete 8-bar rhythm without stopping or missing chord downbeats.',
+            category: 'repertoire',
+            tempoBpm: 70,
+            timeSignature: '4/4',
+            keySignature: 'E Minor',
+            notes: [
+              { id: 'g-l1-b1', name: 'Em (Bar 1-2)', frequency: 82.41, durationMs: 4000, fret: 0, stringIndex: 0, finger: 0, startTimeMs: 0 },
+              { id: 'g-l1-b2', name: 'Am (Bar 3-4)', frequency: 110.00, durationMs: 4000, fret: 1, stringIndex: 4, finger: 1, startTimeMs: 4000 },
+              { id: 'g-l1-b3', name: 'C (Bar 5-6)', frequency: 130.81, durationMs: 4000, fret: 3, stringIndex: 1, finger: 3, startTimeMs: 8000 },
+              { id: 'g-l1-b4', name: 'Em Final (Bar 7-8)', frequency: 82.41, durationMs: 4000, fret: 0, stringIndex: 0, finger: 0, startTimeMs: 12000 },
+            ],
+            postureGuidance: {
+              ideal: 'Loose pendulum strumming wrist motion from forearm; left hand anchors effortlessly.',
+              commonMistakes: ['Stiff elbow driving the strum instead of relaxed wrist', 'Hesitating during chord change'],
+              correctiveTip: 'Keep right hand strumming like a continuous pendulum even while left hand pivots.'
             }
           }
         ]
       },
+
+      // ---------------------------------------------------------------------
+      // LEVEL 2: EARLY INTERMEDIATE (CHORD EXPANSION & PENTATONICS)
+      // ---------------------------------------------------------------------
       {
         levelNumber: 2,
-        title: 'Tier 2: Early Intermediate',
+        title: 'Level 2: Early Intermediate',
         tierName: 'Early Intermediate',
         durationSpan: 'Months 2–4',
         dailyPracticeMinutes: '45–60 min/day',
-        focusSummary: 'Full open chord library, strumming variations, hammer-ons, pull-offs, minor pentatonic scale Box 1.',
-        outcome: 'Play Travis picking patterns (P-I-M-A) and improvise lead licks with A minor pentatonic.',
+        focusSummary: 'Open chord expansion (G, D, Maj7, E), syncopated "Down-Down-Up-Up-Down-Up" strumming, Minor Pentatonic Box 1, and hammer-ons/pull-offs.',
+        outcome: 'Master syncopated strumming patterns, alternate-pick the E Minor Pentatonic scale, and play expressive hammer-on / pull-off licks.',
         accentColor: '#FF8066',
         requiredXp: 300,
         unlocked: true,
         completed: false,
-        completionPercent: 35,
+        completionPercent: 40,
         dailyRoutine: [
-          { activity: 'Travis picking pattern on G & C chords', minutes: 12 },
-          { activity: 'A Minor Pentatonic Box 1 with metronome', minutes: 12 },
-          { activity: 'Hammer-on & pull-off articulation drills', minutes: 10 },
-          { activity: 'Repertoire: Wish You Were Here / Tum Se Hi', minutes: 20 },
+          { activity: 'Syncopated D-D-U-U-D-U pattern with muted strings', minutes: 10 },
+          { activity: 'Chord switch drills (G - D - Maj7 - E)', minutes: 12 },
+          { activity: 'Minor Pentatonic Box 1 alternate picking', minutes: 13 },
+          { activity: 'Hammer-on & pull-off articulation on strings 1-3', minutes: 15 },
         ],
         repertoireMilestones: [
-          { title: 'Wish You Were Here (Acoustic Intro)', artistOrComposer: 'Pink Floyd', type: 'Western/Classical', keyOrRaga: 'G Major / Em', tempoBpm: 60 },
-          { title: 'Californication Solo (Box 1 Intro)', artistOrComposer: 'Red Hot Chili Peppers', type: 'Contemporary/Pop', keyOrRaga: 'A Minor Pentatonic', tempoBpm: 88 },
-          { title: 'Tum Se Hi (Fingerpicked Verse)', artistOrComposer: 'Pritam / Jab We Met', type: 'Indian/Hindi', keyOrRaga: 'C–G–Am–F', tempoBpm: 76 },
+          { title: 'Level 2 Boss: 12-Bar Rhythm & Pentatonic Box 1 Run', artistOrComposer: 'VIBEX Blues Lab', type: 'Contemporary/Pop', keyOrRaga: 'E Minor / Blues', tempoBpm: 80 },
+          { title: 'Knockin on Heavens Door', artistOrComposer: 'Bob Dylan', type: 'Contemporary/Pop', keyOrRaga: 'G - D - Am / C', tempoBpm: 68 },
+          { title: 'Wish You Were Here (Acoustic Intro)', artistOrComposer: 'Pink Floyd', type: 'Western/Classical', keyOrRaga: 'G Major', tempoBpm: 60 },
         ],
         exercises: [
           {
-            id: 'guitar-t2-ex1',
-            title: 'A Minor Pentatonic Scale (Box 1, 5th Fret)',
-            subtitle: '5-8, 5-7, 5-7, 5-7, 5-8, 5-8 alternate pick strokes',
+            id: 'guitar-l2-ex1',
+            title: 'Open Chord Expansion & Syncopated Strumming',
+            subtitle: 'Module 2.1: G, D, Maj7, and E with "Down-Down-Up-Up-Down-Up" pattern',
             durationMinutes: 10,
             difficulty: 2,
-            goal: 'Perform Box 1 ascending and descending cleanly at 70 BPM with alternate picking.',
-            category: 'scales_alankars',
-            tempoBpm: 70,
+            goal: 'Execute syncopated strum pattern smoothly while transitioning across G, D, and E Major.',
+            category: 'chords_triads',
+            tempoBpm: 75,
             timeSignature: '4/4',
-            keySignature: 'A Minor Pentatonic',
+            keySignature: 'G Major / D Major',
             notes: [
-              { id: 'g-t2-1', name: 'A2', frequency: 110.00, durationMs: 600, fret: 5, stringIndex: 0, finger: 1, startTimeMs: 0 },
-              { id: 'g-t2-2', name: 'C3', frequency: 130.81, durationMs: 600, fret: 8, stringIndex: 0, finger: 4, startTimeMs: 600 },
-              { id: 'g-t2-3', name: 'D3', frequency: 146.83, durationMs: 600, fret: 5, stringIndex: 1, finger: 1, startTimeMs: 1200 },
-              { id: 'g-t2-4', name: 'E3', frequency: 164.81, durationMs: 600, fret: 7, stringIndex: 1, finger: 3, startTimeMs: 1800 },
-              { id: 'g-t2-5', name: 'G3', frequency: 196.00, durationMs: 600, fret: 5, stringIndex: 2, finger: 1, startTimeMs: 2400 },
-              { id: 'g-t2-6', name: 'A3', frequency: 220.00, durationMs: 1200, fret: 7, stringIndex: 2, finger: 3, startTimeMs: 3000 },
+              { id: 'g-l2-1', name: 'G Major', frequency: 98.00, durationMs: 2000, fret: 3, stringIndex: 0, finger: 2, startTimeMs: 0 },
+              { id: 'g-l2-2', name: 'D Major', frequency: 146.83, durationMs: 2000, fret: 2, stringIndex: 3, finger: 1, startTimeMs: 2000 },
+              { id: 'g-l2-3', name: 'C Maj7', frequency: 130.81, durationMs: 2000, fret: 2, stringIndex: 2, finger: 2, startTimeMs: 4000 },
+              { id: 'g-l2-4', name: 'E Major', frequency: 82.41, durationMs: 2000, fret: 1, stringIndex: 3, finger: 1, startTimeMs: 6000 },
             ],
             postureGuidance: {
-              ideal: 'Fret right behind the metal fret wire. Keep picking hand wrist resting lightly on bridge saddle.',
-              commonMistakes: ['Reaching with pinky without shifting thumb anchor', 'Only picking downstrokes'],
-              correctiveTip: 'Alternate strictly: Down, Up, Down, Up across strings.'
+              ideal: 'Fret hand ring finger stays close to fret 3 as common pivot point between G and D.',
+              commonMistakes: ['Stopping right hand strumming on the "and" of beat 2', 'Hitting 6th string on D major chord'],
+              correctiveTip: 'Thumb should rest lightly touching the edge of 6th string to mute it on D major.'
+            }
+          },
+          {
+            id: 'guitar-l2-ex2',
+            title: 'Minor Pentatonic Scale (Box 1) & Alternate Picking',
+            subtitle: 'Module 2.2: Root E Box 1 shape with Down-Up pick direction and fret proximity',
+            durationMinutes: 10,
+            difficulty: 2,
+            goal: 'Alternate pick all 12 notes of Pentatonic Box 1 ascending and descending at 80 BPM.',
+            category: 'scales_alankars',
+            tempoBpm: 80,
+            timeSignature: '4/4',
+            keySignature: 'E Minor Pentatonic',
+            notes: [
+              { id: 'g-l2-5', name: 'E2', frequency: 82.41, durationMs: 500, fret: 0, stringIndex: 0, finger: 0, startTimeMs: 0 },
+              { id: 'g-l2-6', name: 'G2', frequency: 98.00, durationMs: 500, fret: 3, stringIndex: 0, finger: 3, startTimeMs: 500 },
+              { id: 'g-l2-7', name: 'A2', frequency: 110.00, durationMs: 500, fret: 0, stringIndex: 1, finger: 0, startTimeMs: 1000 },
+              { id: 'g-l2-8', name: 'B2', frequency: 123.47, durationMs: 500, fret: 2, stringIndex: 1, finger: 2, startTimeMs: 1500 },
+              { id: 'g-l2-9', name: 'D3', frequency: 146.83, durationMs: 500, fret: 0, stringIndex: 2, finger: 0, startTimeMs: 2000 },
+              { id: 'g-l2-10', name: 'E3', frequency: 164.81, durationMs: 500, fret: 2, stringIndex: 2, finger: 2, startTimeMs: 2500 },
+            ],
+            postureGuidance: {
+              ideal: 'Pick strokes strictly alternate (Down, Up, Down, Up). Fretting fingers hover directly over their respective frets.',
+              commonMistakes: ['Flying fingers lifting more than 1 inch off the fretboard', 'All downstrokes with pick'],
+              correctiveTip: 'Keep picking hand relaxed at the wrist; motion should be small and economical.'
+            }
+          },
+          {
+            id: 'guitar-l2-boss',
+            title: 'Practice Node 2 Boss: 12-Bar Rhythm & Box 1 Pentatonic Lead Run',
+            subtitle: 'Module 2.3: Expressive hammer-ons, pull-offs, and continuous 12-bar blues performance',
+            durationMinutes: 14,
+            difficulty: 3,
+            goal: 'Perform continuous 12-bar syncopated rhythm followed by an expressive Box 1 solo run.',
+            category: 'repertoire',
+            tempoBpm: 85,
+            timeSignature: '4/4',
+            keySignature: 'E Minor / Blues',
+            notes: [
+              { id: 'g-l2-b1', name: 'E5 Power Strum', frequency: 82.41, durationMs: 2000, fret: 0, stringIndex: 0, finger: 0, startTimeMs: 0 },
+              { id: 'g-l2-b2', name: 'Hammer-on D to E', frequency: 164.81, durationMs: 1000, fret: 2, stringIndex: 2, finger: 2, startTimeMs: 2000 },
+              { id: 'g-l2-b3', name: 'Pull-off G to E', frequency: 164.81, durationMs: 1000, fret: 0, stringIndex: 2, finger: 0, startTimeMs: 3000 },
+              { id: 'g-l2-b4', name: 'E Minor Pentatonic Peak', frequency: 329.63, durationMs: 2000, fret: 0, stringIndex: 5, finger: 0, startTimeMs: 4000 },
+            ],
+            postureGuidance: {
+              ideal: 'Snap finger firmly onto fretboard for hammer-on without strumming; flick string downward for pull-off.',
+              commonMistakes: ['Weak hammer-on producing inaudible second note', 'Pull-off displacing neighboring string'],
+              correctiveTip: 'Use the tip of finger 2 to hammer with percussive authority directly behind fret wire 2.'
             }
           }
         ]
       },
+
+      // ---------------------------------------------------------------------
+      // LEVEL 3: INTERMEDIATE (BARRE CHORDS & FINGERSTYLE)
+      // ---------------------------------------------------------------------
       {
         levelNumber: 3,
-        title: 'Tier 3: Intermediate',
+        title: 'Level 3: Intermediate',
         tierName: 'Intermediate',
         durationSpan: 'Months 5–8',
         dailyPracticeMinutes: '60–90 min/day',
-        focusSummary: 'F-shape and B-shape Barre chords, fingerstyle patterns, palm muting, full fretboard pentatonic integration.',
-        outcome: 'Clamp full 6-string and 5-string barre chords cleanly; execute string bends and vibrato over blues progressions.',
+        focusSummary: 'F-shape & B-shape barre chords, index finger barre pressure, P-I-M-A fingerpicking, palm muting, and triad ear training.',
+        outcome: 'Cleanly ring all 6 strings on full barre chords, execute Travis picking and bridge palm muting, and identify major vs minor chord triads.',
         accentColor: '#FF8066',
-        requiredXp: 800,
+        requiredXp: 750,
         unlocked: false,
         completed: false,
         completionPercent: 0,
         dailyRoutine: [
-          { activity: 'Barre chord conditioning (F major & B minor)', minutes: 15 },
-          { activity: 'Full fretboard pentatonic boxes 1–5 connection', minutes: 20 },
-          { activity: 'String bending & vibrato mechanics', minutes: 15 },
-          { activity: 'Repertoire: Hotel California / Ae Dil Hai Mushkil', minutes: 25 },
+          { activity: 'Index finger barre clamping drill at frets 1, 3, 5', minutes: 15 },
+          { activity: 'F Major and B Minor movable chord shapes', minutes: 20 },
+          { activity: 'P-I-M-A Travis fingerpicking on open & barre chords', minutes: 20 },
+          { activity: 'Palm muting rhythmic bassline exercises', minutes: 15 },
         ],
         repertoireMilestones: [
-          { title: 'Hotel California (Acoustic Intro & Barre Arpeggios)', artistOrComposer: 'The Eagles', type: 'Contemporary/Pop', keyOrRaga: 'Bm–F#–A–E', tempoBpm: 72 },
-          { title: 'Comfortably Numb (First Solo Bends)', artistOrComposer: 'David Gilmour / Pink Floyd', type: 'Western/Classical', keyOrRaga: 'B Minor Pentatonic', tempoBpm: 65 },
-          { title: 'Ae Dil Hai Mushkil (Barre Dynamics)', artistOrComposer: 'Pritam / Arijit Singh', type: 'Indian/Hindi', keyOrRaga: 'C#m–A–E–B', tempoBpm: 78 },
+          { title: 'Level 3 Boss: Fingerstyle Accompaniment with Barre Transitions', artistOrComposer: 'VIBEX Studio Sessions', type: 'Western/Classical', keyOrRaga: 'B Minor / D Major', tempoBpm: 75 },
+          { title: 'Hotel California (Acoustic Intro Arpeggios)', artistOrComposer: 'Eagles', type: 'Contemporary/Pop', keyOrRaga: 'B Minor', tempoBpm: 75 },
+          { title: 'Ae Dil Hai Mushkil (Barre Chord Dynamics)', artistOrComposer: 'Arijit Singh / Pritam', type: 'Indian/Hindi', keyOrRaga: 'C#m - A - E - B', tempoBpm: 82 },
         ],
         exercises: [
           {
-            id: 'guitar-t3-ex1',
-            title: 'Full F-Major Barre Chord (E-Shape at Fret 1)',
-            subtitle: 'Index finger outer bone roll across all 6 strings with thumb center support',
+            id: 'guitar-l3-ex1',
+            title: 'F-Shape & B-Shape Barre Chord Alignment',
+            subtitle: 'Module 3.1: Even index pressure across 6 strings with wrist arch validation',
             durationMinutes: 12,
             difficulty: 3,
-            goal: 'Sound all 6 strings clearly without buzzing G or B strings.',
+            goal: 'Barre across fret 1 (F) and fret 2 (Bm) with zero muted strings and correct wrist alignment.',
             category: 'chords_triads',
             tempoBpm: 60,
             timeSignature: '4/4',
-            keySignature: 'F Major',
+            keySignature: 'F Major / B Minor',
             notes: [
-              { id: 'g-t3-1', name: 'F2', frequency: 87.31, durationMs: 1000, fret: 1, stringIndex: 0, finger: 1, startTimeMs: 0 },
-              { id: 'g-t3-2', name: 'C3', frequency: 130.81, durationMs: 1000, fret: 3, stringIndex: 1, finger: 3, startTimeMs: 1000 },
-              { id: 'g-t3-3', name: 'F3', frequency: 174.61, durationMs: 1000, fret: 3, stringIndex: 2, finger: 4, startTimeMs: 2000 },
-              { id: 'g-t3-4', name: 'A3', frequency: 220.00, durationMs: 1000, fret: 2, stringIndex: 3, finger: 2, startTimeMs: 3000 },
-              { id: 'g-t3-5', name: 'C4', frequency: 261.63, durationMs: 1000, fret: 1, stringIndex: 4, finger: 1, startTimeMs: 4000 },
-              { id: 'g-t3-6', name: 'F4', frequency: 349.23, durationMs: 1500, fret: 1, stringIndex: 5, finger: 1, startTimeMs: 5000 },
+              { id: 'g-l3-1', name: 'F1 (Barre Bass)', frequency: 87.31, durationMs: 1500, fret: 1, stringIndex: 0, finger: 1, startTimeMs: 0 },
+              { id: 'g-l3-2', name: 'C3 (5th String)', frequency: 130.81, durationMs: 1500, fret: 3, stringIndex: 1, finger: 3, startTimeMs: 1500 },
+              { id: 'g-l3-3', name: 'F3 (4th String)', frequency: 174.61, durationMs: 1500, fret: 3, stringIndex: 2, finger: 4, startTimeMs: 3000 },
+              { id: 'g-l3-4', name: 'A3 (3rd String)', frequency: 220.00, durationMs: 1500, fret: 2, stringIndex: 3, finger: 2, startTimeMs: 4500 },
             ],
             postureGuidance: {
-              ideal: 'Roll index finger slightly onto its bony side edge. Pull backward from shoulder leverage rather than pinching thumb.',
-              commonMistakes: ['Soft fleshy pad muting inside strings', 'Thumb creeping over headstock'],
-              correctiveTip: 'Keep thumb in the vertical center of the back of the neck.'
+              ideal: 'Index finger rotated slightly on its bony outer edge, parallel to fret wire. Wrist dropped slightly below neck.',
+              commonMistakes: ['Bending wrist at an extreme sharp angle causing tendon strain', 'Soft fleshy pad failing to barre string 2'],
+              correctiveTip: 'Pull left elbow gently backward to use back muscle leverage rather than solely thumb pinch.'
             }
-          }
-        ]
-      },
-      {
-        levelNumber: 4,
-        title: 'Tier 4: Advanced',
-        tierName: 'Advanced',
-        durationSpan: 'Months 9–15',
-        dailyPracticeMinutes: '90–120 min/day',
-        focusSummary: 'Major/minor modes, string bending, vibrato mechanics, triad inversions, dynamic rhythm playing.',
-        outcome: 'Improvise modal lines (Dorian, Mixolydian) and master sweep picking over extended 7th & 9th chords.',
-        accentColor: '#FF8066',
-        requiredXp: 1600,
-        unlocked: false,
-        completed: false,
-        completionPercent: 0,
-        dailyRoutine: [
-          { activity: 'Modal soloing (D Dorian & G Mixolydian)', minutes: 25 },
-          { activity: 'Sweep picking arpeggio shapes (D & A major)', minutes: 25 },
-          { activity: 'Dynamic rhythm (funk syncopation & reggae skank)', minutes: 20 },
-          { activity: 'Repertoire: Sweet Child O’ Mine / Nadaan Parindey', minutes: 35 },
-        ],
-        repertoireMilestones: [
-          { title: 'Sweet Child O’ Mine (Lead Solo & Runs)', artistOrComposer: 'Guns N’ Roses', type: 'Contemporary/Pop', keyOrRaga: 'Eb Tuning / D-Shape', tempoBpm: 125 },
-          { title: 'Stairway to Heaven (Full Solo & Fingerstyle)', artistOrComposer: 'Led Zeppelin', type: 'Contemporary/Pop', keyOrRaga: 'A Minor', tempoBpm: 82 },
-          { title: 'Nadaan Parindey (Emotional Dorian Lead)', artistOrComposer: 'A.R. Rahman / Rockstar', type: 'Indian/Hindi', keyOrRaga: 'E Minor / Dorian', tempoBpm: 90 },
-        ],
-        exercises: [
+          },
           {
-            id: 'guitar-t4-ex1',
-            title: 'Dorian Mode Soloing & Precision Full-Step Bends',
-            subtitle: 'Bend 7th fret 3rd string up to pitch of 9th fret using fingers 2 & 3 for support',
-            durationMinutes: 14,
-            difficulty: 4,
-            goal: 'Lock bent pitch exactly to target note without sharp or flat pitch overshoot.',
+            id: 'guitar-l3-ex2',
+            title: 'Travis Fingerstyle (P-I-M-A) & Bridge Palm Muting',
+            subtitle: 'Module 3.2: Alternating bass thumb with treble finger rolls and fleshy percussive mute',
+            durationMinutes: 12,
+            difficulty: 3,
+            goal: 'Maintain continuous thumb bass alternation while index, middle, and ring pluck syncopated melodies.',
             category: 'technique',
             tempoBpm: 75,
             timeSignature: '4/4',
-            keySignature: 'D Dorian',
+            keySignature: 'G Major / E Minor',
             notes: [
-              { id: 'g-t4-1', name: 'D4', frequency: 293.66, durationMs: 800, fret: 7, stringIndex: 2, finger: 3, startTimeMs: 0 },
-              { id: 'g-t4-2', name: 'E4 (Bent)', frequency: 329.63, durationMs: 1500, fret: 9, stringIndex: 2, finger: 3, startTimeMs: 800 },
-              { id: 'g-t4-3', name: 'B3', frequency: 246.94, durationMs: 800, fret: 9, stringIndex: 3, finger: 3, startTimeMs: 2300 },
+              { id: 'g-l3-5', name: 'P (Thumb Bass G)', frequency: 98.00, durationMs: 500, fret: 3, stringIndex: 0, finger: 0, startTimeMs: 0 },
+              { id: 'g-l3-6', name: 'M (Middle String 2)', frequency: 246.94, durationMs: 500, fret: 0, stringIndex: 4, finger: 2, startTimeMs: 500 },
+              { id: 'g-l3-7', name: 'P (Thumb Bass D)', frequency: 146.83, durationMs: 500, fret: 0, stringIndex: 2, finger: 0, startTimeMs: 1000 },
+              { id: 'g-l3-8', name: 'I (Index String 3)', frequency: 196.00, durationMs: 500, fret: 0, stringIndex: 3, finger: 1, startTimeMs: 1500 },
             ],
             postureGuidance: {
-              ideal: 'Rotate fretting wrist like turning a doorknob; do not push from finger tendons alone.',
-              commonMistakes: ['Bending with isolated index finger without supporting fingers', 'Under-bending 15 cents flat'],
-              correctiveTip: 'Keep fingers 1 and 2 directly behind ring finger 3 to reinforce bending force.'
+              ideal: 'Right hand arched naturally above strings; outer edge of palm resting gently near bridge saddles for muting.',
+              commonMistakes: ['Plucking strings upward away from guitar rather than brushing across', 'Resting entire hand on soundboard'],
+              correctiveTip: 'Keep right thumb positioned forward of the fingers so thumb and index never collide.'
+            }
+          },
+          {
+            id: 'guitar-l3-boss',
+            title: 'Practice Node 3 Boss: Fingerstyle Song Accompaniment with Barre Transitions',
+            subtitle: 'Module 3.3: Dynamic fingerpicking with rapid F Major & B Minor barre transitions',
+            durationMinutes: 15,
+            difficulty: 4,
+            goal: 'Perform complete fingerstyle accompaniment with clean barre switches and dynamic touch.',
+            category: 'repertoire',
+            tempoBpm: 80,
+            timeSignature: '4/4',
+            keySignature: 'B Minor',
+            notes: [
+              { id: 'g-l3-b1', name: 'Bm Barre Pattern', frequency: 123.47, durationMs: 2000, fret: 2, stringIndex: 1, finger: 1, startTimeMs: 0 },
+              { id: 'g-l3-b2', name: 'G Major Travis Roll', frequency: 98.00, durationMs: 2000, fret: 3, stringIndex: 0, finger: 2, startTimeMs: 2000 },
+              { id: 'g-l3-b3', name: 'F# Major Barre Tension', frequency: 92.50, durationMs: 2000, fret: 2, stringIndex: 0, finger: 1, startTimeMs: 4000 },
+              { id: 'g-l3-b4', name: 'Bm Final Resolution', frequency: 123.47, durationMs: 2000, fret: 2, stringIndex: 1, finger: 1, startTimeMs: 6000 },
+            ],
+            postureGuidance: {
+              ideal: 'Effortless transition between open chords and barre clamping; steady breathing rhythm.',
+              commonMistakes: ['Squeezing neck during barre chord transitions causing fatigue', 'Rushing tempo during fingerstyle'],
+              correctiveTip: 'Release barre clamp completely 1 sixteenth note before shifting; re-clamp cleanly on downbeat.'
             }
           }
         ]
       },
+
+      // ---------------------------------------------------------------------
+      // LEVEL 4: ADVANCED (MODES, EXPRESSION & SPEED)
+      // ---------------------------------------------------------------------
       {
-        levelNumber: 5,
-        title: 'Tier 5: Professional',
-        tierName: 'Professional',
-        durationSpan: 'Months 16+',
-        dailyPracticeMinutes: '2–3 hours/day',
-        focusSummary: 'Sweep picking, complex chord voicings (9ths, 11ths, 13ths), high-speed lead solos, live tone setup and performance.',
-        outcome: 'Perform full 2-hour set with professional tone shaping, chord-melody arrangements, and hybrid picking mastery.',
+        levelNumber: 4,
+        title: 'Level 4: Advanced',
+        tierName: 'Advanced',
+        durationSpan: 'Months 9–15',
+        dailyPracticeMinutes: '90–120 min/day',
+        focusSummary: 'CAGED system fretboard mapping, top-3 string triad inversions, whole-step pitch bending with DSP verification, vibrato, and modal soloing.',
+        outcome: 'Navigate all 5 CAGED shapes across the neck, bend strings exactly to pitch with DSP confirmation, and improvise over Dorian / Mixolydian modes.',
         accentColor: '#FF8066',
-        requiredXp: 2800,
+        requiredXp: 1500,
         unlocked: false,
         completed: false,
         completionPercent: 0,
         dailyRoutine: [
-          { activity: 'Hybrid picking (pick + fingers) & tapping', minutes: 30 },
-          { activity: 'Jazz chord melody & 13th extensions', minutes: 35 },
-          { activity: 'DAW tone shaping (EQ, compressor, IR cab)', minutes: 30 },
-          { activity: 'Live performance repertoire runs (Sultans of Swing)', minutes: 45 },
+          { activity: 'CAGED shape navigation across 12 frets', minutes: 20 },
+          { activity: 'Triad inversions on strings 1, 2, and 3', minutes: 20 },
+          { activity: 'Pitch bending graph verification (whole-step & half-step)', minutes: 25 },
+          { activity: 'Dorian & Mixolydian lead improvisation over backing track', minutes: 25 },
         ],
         repertoireMilestones: [
-          { title: 'Sultans of Swing (Fingerpicked Leads)', artistOrComposer: 'Dire Straits', type: 'Contemporary/Pop', keyOrRaga: 'D Minor', tempoBpm: 148 },
-          { title: 'Cliffs of Dover (Hybrid Picking Intro)', artistOrComposer: 'Eric Johnson', type: 'Contemporary/Pop', keyOrRaga: 'G Major Pentatonic', tempoBpm: 190 },
-          { title: 'Kun Faya Kun (Sufi Ornamented Lead)', artistOrComposer: 'Rockstar Live', type: 'Indian/Hindi', keyOrRaga: 'Bhairav Modal Fusion', tempoBpm: 80 },
+          { title: 'Level 4 Boss: High-Tempo Lead Solo with Bends & Modal Runs', artistOrComposer: 'VIBEX Virtuoso Series', type: 'Contemporary/Pop', keyOrRaga: 'A Dorian / E Minor', tempoBpm: 110 },
+          { title: 'Sweet Child O Mine (Solo & Bends)', artistOrComposer: 'Guns N Roses', type: 'Contemporary/Pop', keyOrRaga: 'D Major / E Minor', tempoBpm: 125 },
+          { title: 'Nadaan Parindey (Full Lead Solo)', artistOrComposer: 'A.R. Rahman / Mohit Chauhan', type: 'Indian/Hindi', keyOrRaga: 'E Minor / Dorian', tempoBpm: 92 },
         ],
         exercises: [
           {
-            id: 'guitar-t5-ex1',
-            title: 'Sweep Picking 5-String Arpeggio Cascade',
-            subtitle: 'One fluid continuous pick stroke with instantaneous left-hand finger release',
-            durationMinutes: 18,
-            difficulty: 5,
-            goal: 'Execute 5-string sweep at 130 BPM with zero string bleed or overlapping resonance.',
-            category: 'repertoire',
-            tempoBpm: 130,
+            id: 'guitar-l4-ex1',
+            title: 'CAGED System & Top-3 String Triad Inversions',
+            subtitle: 'Module 4.1: Mapping C-A-G-E-D chords and root, 1st, 2nd inversions on strings 1-2-3',
+            durationMinutes: 15,
+            difficulty: 4,
+            goal: 'Connect major and minor triads smoothly up the fretboard across strings 1, 2, and 3.',
+            category: 'chords_triads',
+            tempoBpm: 90,
             timeSignature: '4/4',
-            keySignature: 'D Major',
+            keySignature: 'D Major / A Major',
             notes: [
-              { id: 'g-t5-1', name: 'D3', frequency: 146.83, durationMs: 300, fret: 5, stringIndex: 1, finger: 1, startTimeMs: 0 },
-              { id: 'g-t5-2', name: 'F#3', frequency: 185.00, durationMs: 300, fret: 4, stringIndex: 2, finger: 2, startTimeMs: 300 },
-              { id: 'g-t5-3', name: 'A3', frequency: 220.00, durationMs: 300, fret: 2, stringIndex: 3, finger: 1, startTimeMs: 600 },
-              { id: 'g-t5-4', name: 'D4', frequency: 293.66, durationMs: 300, fret: 3, stringIndex: 4, finger: 2, startTimeMs: 900 },
-              { id: 'g-t5-5', name: 'F#4', frequency: 369.99, durationMs: 600, fret: 2, stringIndex: 5, finger: 1, startTimeMs: 1200 },
+              { id: 'g-l4-1', name: 'D Root Triad (F#4-A4-D5)', frequency: 369.99, durationMs: 1000, fret: 2, stringIndex: 5, finger: 1, startTimeMs: 0 },
+              { id: 'g-l4-2', name: 'D 1st Inversion (A4-D5-F#5)', frequency: 440.00, durationMs: 1000, fret: 5, stringIndex: 5, finger: 2, startTimeMs: 1000 },
+              { id: 'g-l4-3', name: 'D 2nd Inversion (D5-F#5-A5)', frequency: 587.33, durationMs: 1000, fret: 10, stringIndex: 5, finger: 3, startTimeMs: 2000 },
             ],
             postureGuidance: {
-              ideal: 'Pick glides across strings like a brush; lift fretting finger the instant note sounds to prevent ringing.',
-              commonMistakes: ['Strumming all strings into a chord rather than sequential single-note sweeps', 'Tense pick grip'],
-              correctiveTip: 'Keep pick angled slightly inward so it slices smoothly across strings.'
+              ideal: 'Hand glides smoothly between fret positions with thumb sliding along the neck groove.',
+              commonMistakes: ['Anchoring thumb stubbornly in one fret pocket causing wrist stretch', 'Muting string 1 on high inversions'],
+              correctiveTip: 'Let the thumb travel along the center spine of the guitar neck parallel to left hand movement.'
+            }
+          },
+          {
+            id: 'guitar-l4-ex2',
+            title: 'Precision Whole-Step Pitch Bending & Sustained Vibrato',
+            subtitle: 'Module 4.2: Bend 7th fret (G) to match 9th fret (A) verified via real-time pitch cents graph',
+            durationMinutes: 15,
+            difficulty: 4,
+            goal: 'Bend string exactly 200 cents (whole step) to target frequency and sustain with even vibrato.',
+            category: 'technique',
+            tempoBpm: 80,
+            timeSignature: '4/4',
+            keySignature: 'A Minor Lead',
+            notes: [
+              { id: 'g-l4-4', name: 'D4 Natural Note (Fret 7)', frequency: 293.66, durationMs: 1000, fret: 7, stringIndex: 2, finger: 3, startTimeMs: 0 },
+              { id: 'g-l4-5', name: 'E4 Whole Step Bend (Target)', frequency: 329.63, durationMs: 2000, fret: 7, stringIndex: 2, finger: 3, startTimeMs: 1000 },
+              { id: 'g-l4-6', name: 'A4 High String Bend', frequency: 440.00, durationMs: 2000, fret: 8, stringIndex: 4, finger: 3, startTimeMs: 3000 },
+            ],
+            postureGuidance: {
+              ideal: 'Use fingers 1, 2, and 3 together behind the bending finger for mechanical support. Rotate forearm from wrist.',
+              commonMistakes: ['Bending with a single finger causing pitch flatting and slippage', 'Under-bending pitch by 30-50 cents'],
+              correctiveTip: 'Drive the bend using forearm rotation like turning a doorknob, keeping fingers 1 & 2 locked to reinforce finger 3.'
+            }
+          },
+          {
+            id: 'guitar-l4-boss',
+            title: 'Practice Node 4 Boss: High-Tempo Lead Solo with Bends & Modal Runs',
+            subtitle: 'Module 4.3: Dorian & Mixolydian runs, fast legato phrasing, and whole-step bends at 110 BPM',
+            durationMinutes: 18,
+            difficulty: 5,
+            goal: 'Complete full high-tempo lead track hitting every target pitch bend within +/- 15 cents.',
+            category: 'repertoire',
+            tempoBpm: 110,
+            timeSignature: '4/4',
+            keySignature: 'A Dorian',
+            notes: [
+              { id: 'g-l4-b1', name: 'Dorian Ascending Run', frequency: 440.00, durationMs: 500, fret: 5, stringIndex: 5, finger: 1, startTimeMs: 0 },
+              { id: 'g-l4-b2', name: 'High Bend to E5', frequency: 659.25, durationMs: 1500, fret: 12, stringIndex: 5, finger: 3, startTimeMs: 500 },
+              { id: 'g-l4-b3', name: 'Mixolydian Flatted 7th Lick', frequency: 587.33, durationMs: 1000, fret: 10, stringIndex: 4, finger: 1, startTimeMs: 2000 },
+              { id: 'g-l4-b4', name: 'Vibrato Sustain Ending', frequency: 440.00, durationMs: 2000, fret: 5, stringIndex: 5, finger: 1, startTimeMs: 3000 },
+            ],
+            postureGuidance: {
+              ideal: 'High concert stage posture; neck elevated 40 degrees for effortless access past fret 12.',
+              commonMistakes: ['Tense shoulders causing rapid fatigue at high tempos', 'Inconsistent vibrato pulse rate'],
+              correctiveTip: 'Keep thumb resting gently behind fret 10; relax the jaw and breathe evenly during fast passages.'
+            }
+          }
+        ]
+      },
+
+      // ---------------------------------------------------------------------
+      // LEVEL 5: PROFESSIONAL (MASTERY, SWEEPING & PERFORMANCE)
+      // ---------------------------------------------------------------------
+      {
+        levelNumber: 5,
+        title: 'Level 5: Professional',
+        tierName: 'Professional',
+        durationSpan: 'Months 16+',
+        dailyPracticeMinutes: '2–3 hours/day',
+        focusSummary: '3-string & 5-string sweep arpeggios, two-handed fretboard tapping, extended voicings (Maj9, Min11, Altered Dominants), and key-modulating concert solos.',
+        outcome: 'Execute fluid sweep arpeggios at 120+ BPM, tap polyphonic lines across the fingerboard, and deliver complete concert solos with real-time pose and pitch evaluation.',
+        accentColor: '#FF8066',
+        requiredXp: 3000,
+        unlocked: false,
+        completed: false,
+        completionPercent: 0,
+        dailyRoutine: [
+          { activity: '3-string and 5-string sweep picking routines', minutes: 30 },
+          { activity: 'Two-handed fretboard tapping & tap harmonics', minutes: 25 },
+          { activity: 'Modern chord voicings: Maj9, Min11, Altered Dominants', minutes: 25 },
+          { activity: 'Dynamic key-modulating concert solo performance', minutes: 40 },
+        ],
+        repertoireMilestones: [
+          { title: 'Level 5 Boss: Full Concert Solo Performance Evaluation', artistOrComposer: 'VIBEX Concert Stage', type: 'Contemporary/Pop', keyOrRaga: 'Modulating (Em - G - Dm - Am)', tempoBpm: 120 },
+          { title: 'Cliffs of Dover (Hybrid Picking & Fast Pentatonics)', artistOrComposer: 'Eric Johnson', type: 'Contemporary/Pop', keyOrRaga: 'G Major', tempoBpm: 140 },
+          { title: 'Sufi & Indian Classical Fusion Raga Solo', artistOrComposer: 'Rockstar / Fusion Style', type: 'Indian/Hindi', keyOrRaga: 'Raag Bhairav Guitar Arrangement', tempoBpm: 95 },
+        ],
+        exercises: [
+          {
+            id: 'guitar-l5-ex1',
+            title: '3-String & 5-String Sweep Arpeggios and Two-Hand Tapping',
+            subtitle: 'Module 5.1: Synchronized single-motion pick rake with instantaneous finger release',
+            durationMinutes: 20,
+            difficulty: 5,
+            goal: 'Perform 5-string Major and Minor sweep arpeggios cleanly at 120 BPM with zero string ringing.',
+            category: 'technique',
+            tempoBpm: 120,
+            timeSignature: '4/4',
+            keySignature: 'A Minor / C Major Arpeggios',
+            notes: [
+              { id: 'g-l5-1', name: 'A2 Sweep Root (Fret 12)', frequency: 110.00, durationMs: 250, fret: 12, stringIndex: 1, finger: 1, startTimeMs: 0 },
+              { id: 'g-l5-2', name: 'E3 Sweep 5th (Fret 14)', frequency: 164.81, durationMs: 250, fret: 14, stringIndex: 2, finger: 3, startTimeMs: 250 },
+              { id: 'g-l5-3', name: 'A3 Sweep Octave (Fret 14)', frequency: 220.00, durationMs: 250, fret: 14, stringIndex: 3, finger: 3, startTimeMs: 500 },
+              { id: 'g-l5-4', name: 'C4 Sweep Minor 3rd (Fret 13)', frequency: 261.63, durationMs: 250, fret: 13, stringIndex: 4, finger: 2, startTimeMs: 750 },
+              { id: 'g-l5-5', name: 'E4 Sweep High (Fret 12)', frequency: 329.63, durationMs: 250, fret: 12, stringIndex: 5, finger: 1, startTimeMs: 1000 },
+              { id: 'g-l5-6', name: 'A4 Tap High Apex (Fret 17)', frequency: 440.00, durationMs: 500, fret: 17, stringIndex: 5, finger: 0, startTimeMs: 1250 },
+            ],
+            postureGuidance: {
+              ideal: 'Pick glides across strings in one uninterrupted continuous sweep; fretting fingers lift the microsecond note sounds to eliminate sympathetic resonance.',
+              commonMistakes: ['Strumming all strings into a chord rather than sequential single-note sweeps', 'Excessive pick depth catching strings'],
+              correctiveTip: 'Angle pick 15 degrees downward; use the right hand edge to gently damp lower strings during the sweep.'
+            }
+          },
+          {
+            id: 'guitar-l5-ex2',
+            title: 'Dynamic Modern Voicings: Maj9, Min11, and Altered Dominants',
+            subtitle: 'Module 5.1: Harmonic richness with wide intervals and dissonant colorations',
+            durationMinutes: 18,
+            difficulty: 5,
+            goal: 'Voice extended jazz/fusion chords with clean string separation and voice leading.',
+            category: 'chords_triads',
+            tempoBpm: 90,
+            timeSignature: '4/4',
+            keySignature: 'Jazz/Fusion Progressions',
+            notes: [
+              { id: 'g-l5-7', name: 'C Maj9 Voicing', frequency: 130.81, durationMs: 2000, fret: 3, stringIndex: 1, finger: 1, startTimeMs: 0 },
+              { id: 'g-l5-8', name: 'D Min11 Voicing', frequency: 146.83, durationMs: 2000, fret: 5, stringIndex: 1, finger: 1, startTimeMs: 2000 },
+              { id: 'g-l5-9', name: 'G7 Altered (b9#9#11)', frequency: 98.00, durationMs: 2000, fret: 3, stringIndex: 0, finger: 1, startTimeMs: 4000 },
+            ],
+            postureGuidance: {
+              ideal: 'Wrist extended naturally with generous finger spread; thumb centered on back of neck.',
+              commonMistakes: ['Tense palm gripping neck tightly preventing 4-fret stretch', 'Collapsing pinky knuckle on string 1'],
+              correctiveTip: 'Keep neck angled upward; drop wrist slightly forward to allow fingers 3 and 4 to spread freely.'
+            }
+          },
+          {
+            id: 'guitar-l5-boss',
+            title: 'Practice Node 5 Boss: Full Concert Solo Performance Evaluation',
+            subtitle: 'Module 5.2: Complete multi-key solo performance evaluation with real-time pose and pitch scoring',
+            durationMinutes: 25,
+            difficulty: 5,
+            goal: 'Deliver complete concert solo achieving >90% pitch intonation, tempo stability, and ergonomic posture.',
+            category: 'repertoire',
+            tempoBpm: 120,
+            timeSignature: '4/4',
+            keySignature: 'Modulating (E Minor -> A Dorian -> C Major)',
+            notes: [
+              { id: 'g-l5-b1', name: 'Em Intro Theme', frequency: 164.81, durationMs: 2000, fret: 2, stringIndex: 2, finger: 2, startTimeMs: 0 },
+              { id: 'g-l5-b2', name: 'A Dorian Modulation Run', frequency: 440.00, durationMs: 2000, fret: 5, stringIndex: 5, finger: 1, startTimeMs: 2000 },
+              { id: 'g-l5-b3', name: '5-String Sweep Climax', frequency: 659.25, durationMs: 2000, fret: 12, stringIndex: 5, finger: 1, startTimeMs: 4000 },
+              { id: 'g-l5-b4', name: 'Tapped Harmonic Outro', frequency: 880.00, durationMs: 4000, fret: 17, stringIndex: 5, finger: 0, startTimeMs: 6000 },
+            ],
+            postureGuidance: {
+              ideal: 'True virtuoso stage command; fluid transitions across frets 0 to 17, relaxed breathing and facial composure.',
+              commonMistakes: ['Holding breath during virtuosic sweep sections', 'Tense upper traps lifting shoulders toward ears'],
+              correctiveTip: 'Anchor yourself in deep diaphragmatic breathing; trust muscle memory and relax into performance flow.'
             }
           }
         ]
       }
     ]
   },
-
   // =========================================================================
   // D. VIOLIN
   // =========================================================================
@@ -1343,5 +1571,825 @@ export const EAR_TRAINING_QUESTIONS: EarTrainingQuestion[] = [
       { label: 'A Dominant 7th', isCorrect: false }
     ],
     explanation: 'An A Minor chord features a Minor 3rd (C natural) 3 semitones above the root A, giving its distinctive contemplative timbre.'
+  },
+  {
+    id: 'ear-guitar-string-pitch',
+    category: 'single_note',
+    prompt: 'Listen to the two guitar strings plucked sequentially. Is the second note HIGHER or LOWER in pitch than the first?',
+    targetFrequencies: [82.41, 146.83], // Low E2 (6th string) to D3 (4th string)
+    options: [
+      { label: 'Second note is HIGHER in pitch', isCorrect: true },
+      { label: 'Second note is LOWER in pitch', isCorrect: false },
+      { label: 'Both notes are the same pitch (unison)', isCorrect: false }
+    ],
+    explanation: 'Plucking the 4th string (D3, 146.8 Hz) produces a higher fundamental frequency than the 6th string (Low E2, 82.4 Hz). Guitar strings increase in pitch from string 6 (thickest) to string 1 (thinnest).'
+  },
+  {
+    id: 'ear-guitar-triad-quality',
+    category: 'chord',
+    prompt: 'Identify the triad chord quality played across the top 3 guitar strings.',
+    targetFrequencies: [196.00, 246.94, 293.66], // G Major Triad (G, B, D)
+    options: [
+      { label: 'Major Triad (Bright, Uplifting)', isCorrect: true },
+      { label: 'Minor Triad (Pensive, Dark)', isCorrect: false },
+      { label: 'Diminished Triad (Tense, Suspenseful)', isCorrect: false },
+      { label: 'Suspended 4th (Open, Unresolved)', isCorrect: false }
+    ],
+    explanation: 'The Major triad features a Major 3rd interval (4 semitones) between root and third, giving it its classic bright, consonant resonance.'
   }
 ];
+
+
+
+// =========================================================================
+// STRUCTURED LESSON TUTORIALS (WATCH MODE)
+// =========================================================================
+export const LESSON_TUTORIALS: Record<string, LessonTutorial> = {
+  // Guitar Tutorials
+  'tut-g-1.1': {
+    id: 'tut-g-1.1',
+    title: 'Guitar Posture, Tuning & Strumming Mechanics',
+    subtitle: 'Module 1.1: Establishing ergonomic foundations before touching frets',
+    durationMinutes: 4,
+    summary: 'Master seated instrument posture, neck upward angle, centerline thumb alignment, and standard tuning verification with downstrokes.',
+    keyTakeaways: [
+      'Sit upright on the front half of the chair; rest waist of guitar on right thigh (or left for classical).',
+      'Angle neck upward 30-40 degrees so the fretting hand does not have to bend uncomfortably at the wrist.',
+      'Place thumb pad flat against the vertical centerline of the back of the neck, directly opposite fret 2.',
+      'Tune 6 open strings: E2 (82.4 Hz), A2 (110 Hz), D3 (146.8 Hz), G3 (196 Hz), B3 (246.9 Hz), E4 (329.6 Hz).',
+      'Execute downward pick strokes across all strings with a relaxed wrist pendulum motion at 60 BPM.',
+    ],
+    visualAids: ['Guitar Body Balance Diagram', 'Thumb Centerline Placement', 'Pick Angle 15° Down'],
+    postureTips: [
+      'Never allow the thumb to strangle the top of the neck during beginner open position practice.',
+      'Keep left shoulder relaxed and dropped, not hitched up toward your ear.',
+    ]
+  },
+  'tut-g-1.2': {
+    id: 'tut-g-1.2',
+    title: 'First Open Chord Triad: Em, Am, and C Major',
+    subtitle: 'Module 1.2: Knuckle arching, fret wire proximity & 4-beat cadence transitions',
+    durationMinutes: 5,
+    summary: 'Discover the mechanical claw shape needed to cleanly ring open strings while fingering E Minor, A Minor, and C Major.',
+    keyTakeaways: [
+      'E Minor: Place middle finger on fret 2 of A string (string 5), ring finger on fret 2 of D string (string 4). Strum all 6 strings.',
+      'A Minor: Form identical shape shifted one string down, adding index finger to fret 1 of B string (string 2). Strum strings 5 to 1.',
+      'C Major: Pivot ring finger over to fret 3 of A string (string 5) while holding index on B string fret 1. Strum strings 5 to 1.',
+      'AI Knuckle Arch Rule: Both proximal and distal knuckles must be curved 90° like a cat claw to avoid muting adjacent open strings.',
+      'Fret Proximity: Place finger tips 1-2 millimeters right behind the metal fret wire, never in the middle of the fret pocket.',
+    ],
+    visualAids: ['Em/Am/C Fretboard Tabs', 'Perpendicular Knuckle Arch Camera Check', 'Chord Transition Pivot Map'],
+    postureTips: [
+      'Use the middle finger as an anchor point when shifting between Am and C.',
+      'Ensure high open E string rings completely clear with zero buzzing.',
+    ]
+  },
+  'tut-g-2.1': {
+    id: 'tut-g-2.1',
+    title: 'Open Chord Expansion & Syncopated Strumming',
+    subtitle: 'Module 2.1: Expanding vocabulary with G, D, Maj7, E and the syncopated folk pattern',
+    durationMinutes: 5,
+    summary: 'Expand into G Major, D Major, C Major 7th, and E Major while driving a continuous Down-Down-Up-Up-Down-Up rhythm pattern.',
+    keyTakeaways: [
+      'G Major: Ring finger on high E (fret 3), middle on low E (fret 3), index on A (fret 2).',
+      'D Major: Triangle finger cluster on strings 1, 2, 3 at frets 2 and 3. Mute string 6 with thumb overhang.',
+      'Strumming Pattern: Down, Down, Up, Up, Down, Up (1, 2 &, & 4 &) with constant right-arm pendulum movement.',
+      'Keep the right hand moving even on "ghost" beats where you do not strike strings.',
+    ],
+    visualAids: ['D-D-U-U-D-U Rhythm Matrix', 'Thumb Muting on 6th String'],
+    postureTips: ['Do not stop the right wrist swinging on the upward miss between beat 2 and 3.']
+  },
+  'tut-g-2.2': {
+    id: 'tut-g-2.2',
+    title: 'Minor Pentatonic Scale (Box 1) Architecture',
+    subtitle: 'Module 2.2: Root E open position box, alternate picking & fret proximity',
+    durationMinutes: 5,
+    summary: 'Master the universally acclaimed Minor Pentatonic Box 1 shape with strict alternate picking (Down-Up).',
+    keyTakeaways: [
+      'Root E pattern across 6 strings: 0-3, 0-2, 0-2, 0-2, 0-3, 0-3 (or 5th fret A minor box: 5-8, 5-7, 5-7, 5-7, 5-8, 5-8).',
+      'Alternate Picking Rule: Every note must strictly alternate Down and Up strokes with minimal pick excursion.',
+      'Keep unused fingers hovering no more than half an inch away from the fret wires.',
+    ],
+    visualAids: ['Pentatonic Box 1 Fret Diagram', 'Alternate Picking Down-Up Vectors'],
+    postureTips: ['Rest the fleshy heel of your right thumb lightly on the lower strings to dampen unwanted noise.']
+  },
+  'tut-g-2.3': {
+    id: 'tut-g-2.3',
+    title: 'Expressive Lead Mechanics: Hammer-ons & Pull-offs',
+    subtitle: 'Module 2.3: Slurred articulation without re-picking on strings 1, 2, and 3',
+    durationMinutes: 4,
+    summary: 'Produce fluid legato runs by snapping fingers onto the fretboard (hammer-on) and plucking downward off strings (pull-off).',
+    keyTakeaways: [
+      'Hammer-on: Strike string once with pick, then drive finger 2 or 3 down like a quick hammer onto the target fret.',
+      'Pull-off: Pluck the fretted note, then pluck downward and slightly inward with the fretting finger to sound the lower note.',
+      'Balance volume so the hammered note matches the dynamic level of the picked note.',
+    ],
+    visualAids: ['Hammer-on Percussive Snap Angle', 'Pull-off Pluck Vector'],
+    postureTips: ['Keep wrist steady; generate hammer power from the finger knuckle, not by moving your whole forearm.']
+  },
+  'tut-g-3.1': {
+    id: 'tut-g-3.1',
+    title: 'F-Shape & B-Shape Movable Barre Chords',
+    subtitle: 'Module 3.1: Even pressure distribution, parallel fret alignment & back-muscle leverage',
+    durationMinutes: 6,
+    summary: 'Unlock the entire fretboard with movable E-shape and A-shape barre chords without hand fatigue.',
+    keyTakeaways: [
+      'Roll index finger slightly onto its bony lateral edge rather than pressing with the soft front pad.',
+      'Index finger must remain strictly parallel to the fret wire, 1mm behind it.',
+      'Pull the left elbow gently into your ribcage to utilize latissimus and bicep weight rather than thumb pinch force.',
+      'F Major (E-shape at fret 1) and B Minor (A-shape at fret 2) form the gateway to any key signature.',
+    ],
+    visualAids: ['Barre Index Bony Edge Angle', 'Elbow Leverage Force Vector', 'E-Shape vs A-Shape Movable Roots'],
+    postureTips: ['Drop wrist slightly under the neck so fingers 2, 3, 4 can arch cleanly over the barre.']
+  },
+  'tut-g-3.2': {
+    id: 'tut-g-3.2',
+    title: 'Travis Fingerstyle (P-I-M-A) & Palm Muting',
+    subtitle: 'Module 3.2: Polyphonic independence between thumb basslines and treble melodies',
+    durationMinutes: 5,
+    summary: 'Combine alternating bass thumb movements (P) with index (I), middle (M), and ring (A) arpeggiated rolls.',
+    keyTakeaways: [
+      'P (Pulgar/Thumb): Handles alternating bass on strings 6, 5, 4.',
+      'I (Indice), M (Medio), A (Anular): Handle melody and harmony on strings 3, 2, 1.',
+      'Palm Muting: Rest the hypothenar pad of the right hand directly over the bridge saddles for a thumpy, acoustic chugging bass.',
+    ],
+    visualAids: ['P-I-M-A Finger Allocation Chart', 'Bridge Saddle Palm Mute Contact Zone'],
+    postureTips: ['Keep the right thumb forward of the fingers to prevent collisions during simultaneous plucks.']
+  },
+  'tut-g-4.1': {
+    id: 'tut-g-4.1',
+    title: 'CAGED System Fretboard Logic & Triad Inversions',
+    subtitle: 'Module 4.1: Seamless neck-wide connectivity across 5 interlocking shapes and top-3 string triads',
+    durationMinutes: 6,
+    summary: 'Demystify the guitar neck by connecting C, A, G, E, and D shapes and mastering root, 1st, and 2nd triad inversions on strings 1-2-3.',
+    keyTakeaways: [
+      'The 5 open shapes connect sequentially: C -> A -> G -> E -> D -> C up the octave.',
+      'Strings 1-2-3 Triads: Master Root position (Root in bass), 1st inversion (3rd in bass), and 2nd inversion (5th in bass).',
+      'Enables voice-leading in rhythm guitar and agile target note targeting in lead solos.',
+    ],
+    visualAids: ['CAGED Interlocking Puzzle Map', 'Strings 1-2-3 Triad Shapes'],
+    postureTips: ['Slide thumb along the center of the neck smoothly when shifting between CAGED positions.']
+  },
+  'tut-g-4.2': {
+    id: 'tut-g-4.2',
+    title: 'Expressive Lead: Whole-Step Bending & Vibrato',
+    subtitle: 'Module 4.2: Pitch graph tracking for accurate micro-tonal bends (+200 cents) and vocal vibrato',
+    durationMinutes: 5,
+    summary: 'Learn David Gilmour-style whole-step bends and vocal-like finger vibrato verified with real-time DSP cents tracking.',
+    keyTakeaways: [
+      'Group fingers 1 and 2 directly behind finger 3 to provide 3-finger muscular support for the bend.',
+      'Rotate forearm like turning a door handle; do not push with finger joints alone.',
+      'Listen for the target pitch (e.g. 7th fret D bent to 9th fret E = +200 cents). The VIBEX DSP meter turns glowing green when in pitch.',
+      'Apply side-to-side wrist vibrato at the top of the bend to add sustain and emotion.',
+    ],
+    visualAids: ['Three-Finger Bending Cluster', 'Forearm Rotation Axis', 'Pitch Cents Trajectory Graph'],
+    postureTips: ['Hook thumb lightly over the top of the neck to establish a solid rotational fulcrum for bending.']
+  },
+  'tut-g-4.3': {
+    id: 'tut-g-4.3',
+    title: 'Modes & Modal Soloing: Dorian and Mixolydian',
+    subtitle: 'Module 4.3: Infusing soulful jazz-rock and Indian Classical fusion flavors',
+    durationMinutes: 6,
+    summary: 'Discover the characteristic intervals of the Dorian mode (Major 6th) and Mixolydian mode (Flatted 7th).',
+    keyTakeaways: [
+      'Dorian Mode: Minor scale with a bright natural 6th degree (used in Santana, Miles Davis, Bollywood jazz fusion).',
+      'Mixolydian Mode: Major scale with a bluesy flat 7th degree (Guns N Roses, Allman Brothers, Classic Rock).',
+      'Target modal color tones on strong beats over backing tracks.',
+    ],
+    visualAids: ['Dorian Color Tones Chart', 'Mixolydian Characteristic Box'],
+    postureTips: ['Keep left elbow floating freely to easily reach wide 4-fret modal box spans.']
+  },
+  'tut-g-5.1': {
+    id: 'tut-g-5.1',
+    title: 'Virtuoso Mechanics: Sweep Picking, Tapping & Extended Voicings',
+    subtitle: 'Module 5.1: Synchronized arpeggio rakes, two-handed fretboard tapping & modern chord colors',
+    durationMinutes: 7,
+    summary: 'Master the high-speed mechanics of 3-string and 5-string sweep arpeggios, two-handed tapping, Maj9, Min11, and Altered dominant shapes.',
+    keyTakeaways: [
+      'Sweep Picking: Push/pull pick in a single uninterrupted brush stroke across strings; lift fretting fingers immediately to prevent ringing.',
+      'Two-Handed Tapping: Hammer right-hand index/middle finger sharply onto high frets and flick off to sound notes.',
+      'Extended Harmony: Major 9th, Minor 11th, and Altered Dominants (7#9, 7b9, 7#11) for modern jazz, neo-soul, and prog metal.',
+    ],
+    visualAids: ['5-String Sweep Rake Vector', 'Tapping Finger Placement', 'Extended Chord Voicing Diagrams'],
+    postureTips: ['Mute unplayed low strings with the palm of your picking hand to maintain surgical note clarity.']
+  },
+  'tut-g-5.2': {
+    id: 'tut-g-5.2',
+    title: 'Professional Performance, Tone Shaping & Concert Improvisation',
+    subtitle: 'Module 5.2: Stage presence, dynamic backing track navigation & multi-key solos',
+    durationMinutes: 8,
+    summary: 'Transition from practice room to concert stage: tone shaping, key modulation, uninterrupted 30-minute endurance, and real-time multimodal evaluation.',
+    keyTakeaways: [
+      'Improvise fluently through shifting tonal centers and modulating key signatures.',
+      'Shape tone using touch dynamics: soft finger-brushing to aggressive pick attacks.',
+      'Maintain poise, continuous breathing, and relaxed posture under full performance pressure.',
+    ],
+    visualAids: ['Key Modulation Transition Map', 'Performance Endurance Timeline'],
+    postureTips: ['Breathe deeply from diaphragm on every musical breath pause; avoid raising shoulders.']
+  }
+};
+
+// =========================================================================
+// CANDY CRUSH PROGRESSION NODES (PRACTICE MAP TRAIL)
+// =========================================================================
+export const GUITAR_PRACTICE_NODES: PracticeNode[] = [
+  // --- LEVEL 1 ---
+  {
+    id: 'g-n-1.1-tut',
+    levelNumber: 1,
+    moduleId: 'mod-1.1',
+    moduleTitle: 'Module 1.1: Posture & Tuning Mechanics',
+    nodeIndex: 1,
+    title: 'Seated Posture & Thumb Alignment',
+    subtitle: 'Tutorial: Learn correct seating, neck angle & thumb placement',
+    type: 'tutorial',
+    tutorialId: 'tut-g-1.1',
+    durationMinutes: 4,
+    xpReward: 50,
+    status: 'completed',
+    stars: 3,
+    accuracyScore: 98,
+    pathOffset: -0.6
+  },
+  {
+    id: 'g-n-1.1-prac',
+    levelNumber: 1,
+    moduleId: 'mod-1.1',
+    moduleTitle: 'Module 1.1: Posture & Tuning Mechanics',
+    nodeIndex: 2,
+    title: 'Open String Tuning & Plucking',
+    subtitle: 'Practice: Verify E2-A2-D3-G3-B3-E4 pitch with YIN algorithm',
+    type: 'practice',
+    exerciseId: 'guitar-l1-ex1',
+    tutorialId: 'tut-g-1.1',
+    durationMinutes: 6,
+    xpReward: 75,
+    status: 'completed',
+    stars: 3,
+    accuracyScore: 95,
+    pathOffset: -0.2
+  },
+  {
+    id: 'g-n-1.2-tut',
+    levelNumber: 1,
+    moduleId: 'mod-1.2',
+    moduleTitle: 'Module 1.2: First Open Chord Triad',
+    nodeIndex: 3,
+    title: 'Em, Am & C Knuckle Arch Geometry',
+    subtitle: 'Tutorial: Watch fingertip perpendicular claw placement',
+    type: 'tutorial',
+    tutorialId: 'tut-g-1.2',
+    durationMinutes: 5,
+    xpReward: 60,
+    status: 'completed',
+    stars: 3,
+    accuracyScore: 92,
+    pathOffset: 0.3
+  },
+  {
+    id: 'g-n-1.2-prac',
+    levelNumber: 1,
+    moduleId: 'mod-1.2',
+    moduleTitle: 'Module 1.2: First Open Chord Triad',
+    nodeIndex: 4,
+    title: '4-Beat Chord Switch Cadence',
+    subtitle: 'Practice: Em -> Am -> C -> Em transitions with live AI Vision',
+    type: 'practice',
+    exerciseId: 'guitar-l1-ex2',
+    tutorialId: 'tut-g-1.2',
+    durationMinutes: 10,
+    xpReward: 90,
+    status: 'active', // Current active node
+    pathOffset: 0.7
+  },
+  {
+    id: 'g-n-1.3-ear',
+    levelNumber: 1,
+    moduleId: 'mod-1.3',
+    moduleTitle: 'Module 1.3: Ear Gym & Rhythmic Practice',
+    nodeIndex: 5,
+    title: 'Ear Gym: Higher vs Lower String Variations',
+    subtitle: 'Bonus: 2-minute quickfire auditory string recognition drill',
+    type: 'ear_gym',
+    earGymQuestionId: 'ear-guitar-string-pitch',
+    durationMinutes: 2,
+    xpReward: 80,
+    status: 'locked',
+    pathOffset: 0.3
+  },
+  {
+    id: 'g-n-1.3-boss',
+    levelNumber: 1,
+    moduleId: 'mod-1.3',
+    moduleTitle: 'Module 1.3: Ear Gym & Rhythmic Practice',
+    nodeIndex: 6,
+    title: 'Level 1 Boss: 8-Bar Open Strum Track (70 BPM)',
+    subtitle: 'Boss Milestone: 8-bar uninterrupted rhythm test with chord transitions',
+    type: 'boss',
+    exerciseId: 'guitar-l1-boss',
+    tutorialId: 'tut-g-1.2',
+    durationMinutes: 12,
+    xpReward: 250,
+    status: 'locked',
+    bossTier: true,
+    bossBadge: 'Level 1 Rhythm Titan',
+    pathOffset: -0.3
+  },
+
+  // --- LEVEL 2 ---
+  {
+    id: 'g-n-2.1-tut',
+    levelNumber: 2,
+    moduleId: 'mod-2.1',
+    moduleTitle: 'Module 2.1: Open Chord Expansion',
+    nodeIndex: 7,
+    title: 'Folk Strumming & Chord Expansion',
+    subtitle: 'Tutorial: G, D, Maj7, E and the syncopated D-D-U-U-D-U pattern',
+    type: 'tutorial',
+    tutorialId: 'tut-g-2.1',
+    durationMinutes: 5,
+    xpReward: 70,
+    status: 'locked',
+    pathOffset: -0.7
+  },
+  {
+    id: 'g-n-2.1-prac',
+    levelNumber: 2,
+    moduleId: 'mod-2.1',
+    moduleTitle: 'Module 2.1: Open Chord Expansion',
+    nodeIndex: 8,
+    title: 'Syncopated Folk Strum Workout',
+    subtitle: 'Practice: Continuous D-D-U-U-D-U across G, D, and E Major',
+    type: 'practice',
+    exerciseId: 'guitar-l2-ex1',
+    tutorialId: 'tut-g-2.1',
+    durationMinutes: 10,
+    xpReward: 100,
+    status: 'locked',
+    pathOffset: -0.3
+  },
+  {
+    id: 'g-n-2.2-tut',
+    levelNumber: 2,
+    moduleId: 'mod-2.2',
+    moduleTitle: 'Module 2.2: Minor Pentatonic Scale',
+    nodeIndex: 9,
+    title: 'Pentatonic Box 1 Architecture',
+    subtitle: 'Tutorial: Alternate picking and fret wire proximity on Root E',
+    type: 'tutorial',
+    tutorialId: 'tut-g-2.2',
+    durationMinutes: 5,
+    xpReward: 75,
+    status: 'locked',
+    pathOffset: 0.2
+  },
+  {
+    id: 'g-n-2.2-prac',
+    levelNumber: 2,
+    moduleId: 'mod-2.2',
+    moduleTitle: 'Module 2.2: Minor Pentatonic Scale',
+    nodeIndex: 10,
+    title: 'Box 1 Alternate Picking Run',
+    subtitle: 'Practice: 12-note ascending and descending picking ladder',
+    type: 'practice',
+    exerciseId: 'guitar-l2-ex2',
+    tutorialId: 'tut-g-2.2',
+    durationMinutes: 10,
+    xpReward: 110,
+    status: 'locked',
+    pathOffset: 0.6
+  },
+  {
+    id: 'g-n-2.3-boss',
+    levelNumber: 2,
+    moduleId: 'mod-2.3',
+    moduleTitle: 'Module 2.3: Expressive Techniques',
+    nodeIndex: 11,
+    title: 'Level 2 Boss: 12-Bar Rhythm & Box 1 Pentatonic Lead Run',
+    subtitle: 'Boss Milestone: Hammer-on & pull-off articulation over 12 bars',
+    type: 'boss',
+    exerciseId: 'guitar-l2-boss',
+    tutorialId: 'tut-g-2.3',
+    durationMinutes: 14,
+    xpReward: 350,
+    status: 'locked',
+    bossTier: true,
+    bossBadge: 'Level 2 Pentatonic Hero',
+    pathOffset: 0.0
+  },
+
+  // --- LEVEL 3 ---
+  {
+    id: 'g-n-3.1-tut',
+    levelNumber: 3,
+    moduleId: 'mod-3.1',
+    moduleTitle: 'Module 3.1: F & B Barre Chords',
+    nodeIndex: 12,
+    title: 'Barre Chord Mechanics & Elbow Leverage',
+    subtitle: 'Tutorial: Index finger lateral rotation & wrist arch validation',
+    type: 'tutorial',
+    tutorialId: 'tut-g-3.1',
+    durationMinutes: 6,
+    xpReward: 90,
+    status: 'locked',
+    pathOffset: -0.6
+  },
+  {
+    id: 'g-n-3.1-prac',
+    levelNumber: 3,
+    moduleId: 'mod-3.1',
+    moduleTitle: 'Module 3.1: F & B Barre Chords',
+    nodeIndex: 13,
+    title: 'F-Shape & B-Shape Clean Clamp Drill',
+    subtitle: 'Practice: Zero-buzz 6-string barre chord intonation test',
+    type: 'practice',
+    exerciseId: 'guitar-l3-ex1',
+    tutorialId: 'tut-g-3.1',
+    durationMinutes: 12,
+    xpReward: 140,
+    status: 'locked',
+    pathOffset: -0.2
+  },
+  {
+    id: 'g-n-3.2-prac',
+    levelNumber: 3,
+    moduleId: 'mod-3.2',
+    moduleTitle: 'Module 3.2: Fingerstyle & Palm Muting',
+    nodeIndex: 14,
+    title: 'Travis Picking (P-I-M-A) & Bridge Muting',
+    subtitle: 'Practice: Alternating bass thumb with treble finger rolls',
+    type: 'practice',
+    exerciseId: 'guitar-l3-ex2',
+    tutorialId: 'tut-g-3.2',
+    durationMinutes: 12,
+    xpReward: 150,
+    status: 'locked',
+    pathOffset: 0.3
+  },
+  {
+    id: 'g-n-3.3-ear',
+    levelNumber: 3,
+    moduleId: 'mod-3.3',
+    moduleTitle: 'Module 3.3: Ear Gym & Fretboard Navigation',
+    nodeIndex: 15,
+    title: 'Ear Gym: Major vs Minor Chord Triad Recognition',
+    subtitle: 'Bonus: Distinguish happy major vs melancholic minor chord voicings',
+    type: 'ear_gym',
+    earGymQuestionId: 'ear-guitar-triad-quality',
+    durationMinutes: 2,
+    xpReward: 120,
+    status: 'locked',
+    pathOffset: 0.7
+  },
+  {
+    id: 'g-n-3.3-boss',
+    levelNumber: 3,
+    moduleId: 'mod-3.3',
+    moduleTitle: 'Module 3.3: Ear Gym & Fretboard Navigation',
+    nodeIndex: 16,
+    title: 'Level 3 Boss: Fingerstyle Accompaniment & Barre Transitions',
+    subtitle: 'Boss Milestone: Rapid Bm & F# barre shifts with acoustic Travis picking',
+    type: 'boss',
+    exerciseId: 'guitar-l3-boss',
+    tutorialId: 'tut-g-3.1',
+    durationMinutes: 15,
+    xpReward: 500,
+    status: 'locked',
+    bossTier: true,
+    bossBadge: 'Level 3 Barre Virtuoso',
+    pathOffset: 0.0
+  },
+
+  // --- LEVEL 4 ---
+  {
+    id: 'g-n-4.1-tut',
+    levelNumber: 4,
+    moduleId: 'mod-4.1',
+    moduleTitle: 'Module 4.1: CAGED & Triad Inversions',
+    nodeIndex: 17,
+    title: 'CAGED Fretboard Mapping & Top-3 Triads',
+    subtitle: 'Tutorial: Connect 5 interlocking chord positions across 12 frets',
+    type: 'tutorial',
+    tutorialId: 'tut-g-4.1',
+    durationMinutes: 6,
+    xpReward: 110,
+    status: 'locked',
+    pathOffset: -0.6
+  },
+  {
+    id: 'g-n-4.1-prac',
+    levelNumber: 4,
+    moduleId: 'mod-4.1',
+    moduleTitle: 'Module 4.1: CAGED & Triad Inversions',
+    nodeIndex: 18,
+    title: 'Top-3 Strings Triad Inversion Ladder',
+    subtitle: 'Practice: Root, 1st, and 2nd inversions up the neck on strings 1-2-3',
+    type: 'practice',
+    exerciseId: 'guitar-l4-ex1',
+    tutorialId: 'tut-g-4.1',
+    durationMinutes: 15,
+    xpReward: 180,
+    status: 'locked',
+    pathOffset: -0.2
+  },
+  {
+    id: 'g-n-4.2-prac',
+    levelNumber: 4,
+    moduleId: 'mod-4.2',
+    moduleTitle: 'Module 4.2: Expressive Lead Techniques',
+    nodeIndex: 19,
+    title: 'Precision Whole-Step Bending (+200 Cents)',
+    subtitle: 'Practice: Real-time pitch graph verification for whole-step bends',
+    type: 'practice',
+    exerciseId: 'guitar-l4-ex2',
+    tutorialId: 'tut-g-4.2',
+    durationMinutes: 15,
+    xpReward: 200,
+    status: 'locked',
+    pathOffset: 0.3
+  },
+  {
+    id: 'g-n-4.3-boss',
+    levelNumber: 4,
+    moduleId: 'mod-4.3',
+    moduleTitle: 'Module 4.3: Modes & Speed Drills',
+    nodeIndex: 20,
+    title: 'Level 4 Boss: High-Tempo Lead Solo with Bends & Modal Runs',
+    subtitle: 'Boss Milestone: 110 BPM Dorian and Mixolydian lead track evaluation',
+    type: 'boss',
+    exerciseId: 'guitar-l4-boss',
+    tutorialId: 'tut-g-4.3',
+    durationMinutes: 18,
+    xpReward: 750,
+    status: 'locked',
+    bossTier: true,
+    bossBadge: 'Level 4 Modal Maestro',
+    pathOffset: 0.0
+  },
+
+  // --- LEVEL 5 ---
+  {
+    id: 'g-n-5.1-tut',
+    levelNumber: 5,
+    moduleId: 'mod-5.1',
+    moduleTitle: 'Module 5.1: Advanced Mechanics',
+    nodeIndex: 21,
+    title: 'Virtuoso Mechanics: Sweep Picking & Tapping',
+    subtitle: 'Tutorial: Synchronized 5-string sweep rakes and extended chords',
+    type: 'tutorial',
+    tutorialId: 'tut-g-5.1',
+    durationMinutes: 7,
+    xpReward: 150,
+    status: 'locked',
+    pathOffset: -0.6
+  },
+  {
+    id: 'g-n-5.1-prac1',
+    levelNumber: 5,
+    moduleId: 'mod-5.1',
+    moduleTitle: 'Module 5.1: Advanced Mechanics',
+    nodeIndex: 22,
+    title: '5-String Sweep Arpeggios & Two-Hand Tapping',
+    subtitle: 'Practice: 120 BPM clean string rakes with zero acoustic bleed',
+    type: 'practice',
+    exerciseId: 'guitar-l5-ex1',
+    tutorialId: 'tut-g-5.1',
+    durationMinutes: 20,
+    xpReward: 250,
+    status: 'locked',
+    pathOffset: -0.2
+  },
+  {
+    id: 'g-n-5.1-prac2',
+    levelNumber: 5,
+    moduleId: 'mod-5.1',
+    moduleTitle: 'Module 5.1: Advanced Mechanics',
+    nodeIndex: 23,
+    title: 'Modern Chord Voicings: Maj9, Min11 & Altered Dominants',
+    subtitle: 'Practice: Wide 4-fret stretch jazz voicings with voice leading',
+    type: 'practice',
+    exerciseId: 'guitar-l5-ex2',
+    tutorialId: 'tut-g-5.1',
+    durationMinutes: 18,
+    xpReward: 250,
+    status: 'locked',
+    pathOffset: 0.4
+  },
+  {
+    id: 'g-n-5.2-boss',
+    levelNumber: 5,
+    moduleId: 'mod-5.2',
+    moduleTitle: 'Module 5.2: Professional Performance',
+    nodeIndex: 24,
+    title: 'Level 5 Final Boss: Complete Concert Solo Performance',
+    subtitle: 'Mastery Milestone: Multimodal AI pose and pitch scoring over modulating keys',
+    type: 'boss',
+    exerciseId: 'guitar-l5-boss',
+    tutorialId: 'tut-g-5.2',
+    durationMinutes: 25,
+    xpReward: 1500,
+    status: 'locked',
+    bossTier: true,
+    bossBadge: 'VIBEX Guitar Grandmaster',
+    pathOffset: 0.0
+  }
+];
+
+export const PRACTICE_NODES_MAP: Record<InstrumentType, PracticeNode[]> = {
+  guitar: GUITAR_PRACTICE_NODES,
+  piano: [
+    {
+      id: 'p-n-1.1',
+      levelNumber: 1,
+      moduleId: 'mod-p1.1',
+      moduleTitle: 'Module 1.1: Posture & Hand Shape',
+      nodeIndex: 1,
+      title: 'Seated Bench Balance & Curved Hand Arch',
+      subtitle: 'Hold tennis ball curve and straight wrist alignment',
+      type: 'tutorial',
+      durationMinutes: 5,
+      xpReward: 50,
+      status: 'completed',
+      stars: 3,
+      accuracyScore: 96,
+      pathOffset: -0.5
+    },
+    {
+      id: 'p-n-1.2',
+      levelNumber: 1,
+      moduleId: 'mod-p1.2',
+      moduleTitle: 'Module 1.2: 5-Finger Pattern',
+      nodeIndex: 2,
+      title: 'C Major 5-Finger Independence Pattern',
+      subtitle: 'Finger 1-2-3-4-5-4-3-2-1 with metronome at 60 BPM',
+      type: 'practice',
+      exerciseId: 'piano-t1-ex1',
+      durationMinutes: 8,
+      xpReward: 80,
+      status: 'active',
+      pathOffset: 0.3
+    },
+    {
+      id: 'p-n-1.3-ear',
+      levelNumber: 1,
+      moduleId: 'mod-p1.3',
+      moduleTitle: 'Module 1.3: Ear Training',
+      nodeIndex: 3,
+      title: 'Ear Gym: C Major Triad Harmonic Recognition',
+      subtitle: 'Identify root position consonance',
+      type: 'ear_gym',
+      earGymQuestionId: 'ear-1',
+      durationMinutes: 2,
+      xpReward: 60,
+      status: 'locked',
+      pathOffset: 0.7
+    },
+    {
+      id: 'p-n-1.4-boss',
+      levelNumber: 1,
+      moduleId: 'mod-p1.4',
+      moduleTitle: 'Module 1.4: Repertoire Boss',
+      nodeIndex: 4,
+      title: 'Level 1 Boss: Ode to Joy Two-Hand Coordination',
+      subtitle: 'Right hand melody with left hand single-note bass',
+      type: 'boss',
+      exerciseId: 'piano-t1-ex2',
+      durationMinutes: 12,
+      xpReward: 250,
+      status: 'locked',
+      bossTier: true,
+      bossBadge: 'Level 1 Piano Virtuoso',
+      pathOffset: 0.0
+    }
+  ],
+  violin: [
+    {
+      id: 'v-n-1.1',
+      levelNumber: 1,
+      moduleId: 'mod-v1.1',
+      moduleTitle: 'Module 1.1: Collarbone Balance',
+      nodeIndex: 1,
+      title: 'Hands-Free Collarbone Balance & Relaxed Jaw',
+      subtitle: 'Support violin weight without left hand squeeze',
+      type: 'tutorial',
+      durationMinutes: 5,
+      xpReward: 50,
+      status: 'completed',
+      stars: 3,
+      accuracyScore: 97,
+      pathOffset: -0.5
+    },
+    {
+      id: 'v-n-1.2',
+      levelNumber: 1,
+      moduleId: 'mod-v1.2',
+      moduleTitle: 'Module 1.2: Straight Bow Highway',
+      nodeIndex: 2,
+      title: 'Open D & A String 4-Count Long Bows',
+      subtitle: 'Keep bow hair strictly parallel to bridge',
+      type: 'practice',
+      exerciseId: 'violin-t1-ex1',
+      durationMinutes: 8,
+      xpReward: 80,
+      status: 'active',
+      pathOffset: 0.3
+    },
+    {
+      id: 'v-n-1.3-ear',
+      levelNumber: 1,
+      moduleId: 'mod-v1.3',
+      moduleTitle: 'Module 1.3: Ear Gym',
+      nodeIndex: 3,
+      title: 'Ear Gym: Perfect 5th Open String Tuning Interval',
+      subtitle: 'Identify 7-semitone string leap',
+      type: 'ear_gym',
+      earGymQuestionId: 'ear-3',
+      durationMinutes: 2,
+      xpReward: 60,
+      status: 'locked',
+      pathOffset: 0.7
+    },
+    {
+      id: 'v-n-1.4-boss',
+      levelNumber: 1,
+      moduleId: 'mod-v1.4',
+      moduleTitle: 'Module 1.4: First Position Boss',
+      nodeIndex: 4,
+      title: 'Level 1 Boss: Twinkle Variations & String Crossings',
+      subtitle: 'Clean intonation on high-2 finger pattern',
+      type: 'boss',
+      exerciseId: 'violin-t1-ex2',
+      durationMinutes: 12,
+      xpReward: 250,
+      status: 'locked',
+      bossTier: true,
+      bossBadge: 'Level 1 Violin Bowmaster',
+      pathOffset: 0.0
+    }
+  ],
+  bansuri: [
+    {
+      id: 'b-n-1.1',
+      levelNumber: 1,
+      moduleId: 'mod-b1.1',
+      moduleTitle: 'Module 1.1: Embouchure & Tone',
+      nodeIndex: 1,
+      title: 'Diaphragmatic Breath & Lip Aperture',
+      subtitle: 'Focus air stream at 45 degree angle across blowhole',
+      type: 'tutorial',
+      durationMinutes: 5,
+      xpReward: 50,
+      status: 'completed',
+      stars: 3,
+      accuracyScore: 98,
+      pathOffset: -0.5
+    },
+    {
+      id: 'b-n-1.2',
+      levelNumber: 1,
+      moduleId: 'mod-b1.2',
+      moduleTitle: 'Module 1.2: Swar Sadhana',
+      nodeIndex: 2,
+      title: 'Sa-Re-Ga Sustained Swar Sadhana',
+      subtitle: 'Produce non-airy, resonant tone with Tanpura drone',
+      type: 'practice',
+      exerciseId: 'bansuri-t1-ex1',
+      durationMinutes: 10,
+      xpReward: 90,
+      status: 'active',
+      pathOffset: 0.3
+    },
+    {
+      id: 'b-n-1.3-ear',
+      levelNumber: 1,
+      moduleId: 'mod-b1.3',
+      moduleTitle: 'Module 1.3: Swara Ear Gym',
+      nodeIndex: 3,
+      title: 'Ear Gym: Pancham (Pa) 3:2 Harmonic Identification',
+      subtitle: 'Spot the immutable grounding 5th degree',
+      type: 'ear_gym',
+      earGymQuestionId: 'ear-2',
+      durationMinutes: 2,
+      xpReward: 70,
+      status: 'locked',
+      pathOffset: 0.7
+    },
+    {
+      id: 'b-n-1.4-boss',
+      levelNumber: 1,
+      moduleId: 'mod-b1.4',
+      moduleTitle: 'Module 1.4: Saral Sargam Boss',
+      nodeIndex: 4,
+      title: 'Level 1 Boss: Complete Bilawal Aroha/Avroha Cycle',
+      subtitle: 'Perform 16-beat cycle with 6-hole fleshy pad seal',
+      type: 'boss',
+      exerciseId: 'bansuri-t1-ex2',
+      durationMinutes: 15,
+      xpReward: 300,
+      status: 'locked',
+      bossTier: true,
+      bossBadge: 'Level 1 Bansuri Swara Master',
+      pathOffset: 0.0
+    }
+  ]
+};

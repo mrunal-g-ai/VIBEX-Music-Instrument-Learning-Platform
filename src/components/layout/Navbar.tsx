@@ -24,10 +24,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard' },
-    { id: 'curriculum', label: 'Curriculum' },
-    { id: 'practice', label: 'Practice' },
-    { id: 'tuner', label: 'Flute Tuner' },
-    { id: 'ear-gym', label: 'Ear Gym' },
+    { id: 'practice-map', label: 'Practice Map' },
+    ...(activeInstrument === 'bansuri' ? [{ id: 'tuner', label: 'Flute Tuner' }] : []),
   ];
 
   const instruments: { id: InstrumentType; label: string; color: string }[] = [
@@ -51,7 +49,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Zone 2: 4-6 clean text navigation links */}
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           {navItems.map((item) => {
-            const isActive = currentTab === item.id;
+            const isActive =
+              currentTab === item.id || (item.id === 'practice-map' && currentTab === 'practice');
             return (
               <button
                 key={item.id}
