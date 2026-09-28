@@ -3,10 +3,34 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { InstrumentType } from '../types/vibex';
 import { CURRICULA, RECOMMENDED_SONGS } from '../data/curriculumData';
-import { Flame, Play, ArrowRight, Sparkles, Award, Clock, Target, CheckCircle2 } from 'lucide-react';
+import { MASTER_GUITAR_LESSONS } from '../data/guitarMasterCurriculum';
+import { VibeTeacherEngine, SKILL_CATEGORIES_METADATA } from '../services/vibeTeacherEngine';
+import { MasterGuitarLesson, DailyClassSession } from '../types/guitarCurriculum';
+import { InteractiveLessonRunner } from '../components/lessons/InteractiveLessonRunner';
+import { GuitarAnatomyExplorer } from '../components/lessons/GuitarAnatomyExplorer';
+import { MasterGuitarFretboard } from '../components/instruments/MasterGuitarFretboard';
+import {
+  Flame,
+  Play,
+  ArrowRight,
+  Sparkles,
+  Award,
+  Clock,
+  Target,
+  CheckCircle2,
+  Calendar,
+  Compass,
+  Zap,
+  BookOpen,
+  Activity,
+  Layers,
+  ChevronRight,
+  X,
+  Volume2,
+} from 'lucide-react';
 
 interface DashboardViewProps {
   activeInstrument: InstrumentType;
@@ -36,6 +60,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const recommendedSong =
     RECOMMENDED_SONGS.find((s) => s.instrument === activeInstrument) || RECOMMENDED_SONGS[0];
 
+  // Guitar Adaptive Studio & Lesson Runner States
+  const [activeLesson, setActiveLesson] = useState<MasterGuitarLesson | null>(null);
+  const [dailyClassModalOpen, setDailyClassModalOpen] = useState<boolean>(false);
+  const [dailySessionData, setDailySessionData] = useState<DailyClassSession | null>(null);
+  const [isAnatomyOpen, setIsAnatomyOpen] = useState<boolean>(false);
+  const [isFretboardLabOpen, setIsFretboardLabOpen] = useState<boolean>(false);
+
+  const teacherEngine = VibeTeacherEngine.getInstance();
+  const skillProfile = teacherEngine.getSkillProfile();
+  const diagnosis = teacherEngine.diagnoseWeaknesses();
+
+  const handleStartDailyClass = () => {
+    const session = teacherEngine.generateDailyClass(MASTER_GUITAR_LESSONS);
+    setDailySessionData(session);
+    setDailyClassModalOpen(true);
+  };
+
+  const handleLaunchTargetedLesson = (lesson: MasterGuitarLesson) => {
+    setDailyClassModalOpen(false);
+    setActiveLesson(lesson);
+  };
+
   const instruments: { id: InstrumentType; name: string; accent: string; description: string }[] = [
     { id: 'piano', name: 'Keyboard / Piano', accent: '#8067FF', description: 'Polyphonic hand arch & 5-finger independence' },
     { id: 'guitar', name: 'Acoustic Guitar', accent: '#FF8066', description: 'Fret proximity & barre chord knuckle arch' },
@@ -56,11 +102,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="flex-1 flex flex-col gap-3 z-10">
           {/* Metadata Discipline */}
           <div className="flex items-center gap-2 text-xs text-[#A9A8BA]">
-            <span className="text-[#54D6C3] font-semibold">Active Session</span>
+            <span className="text-[#54D6C3] font-semibold">Adaptive Studio</span>
             <span aria-hidden="true">·</span>
             <span>{currentCurriculum.displayName}</span>
             <span aria-hidden="true">·</span>
-            <span>{activeLevel.tierName}</span>
+            <span>Levels 0 to 48</span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F6F4FF] tracking-tight">
@@ -68,30 +114,43 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </h1>
 
           <p className="text-sm text-[#A9A8BA] max-w-2xl leading-relaxed">
-            {activeExercise ? `${activeExercise.title}: ${activeExercise.subtitle}` : currentCurriculum.tagline}
+            {activeInstrument === 'guitar'
+              ? 'Complete interactive teaching curriculum from Absolute Beginner to Professional Musician, powered by Vibe AI Teacher.'
+              : activeExercise
+              ? `${activeExercise.title}: ${activeExercise.subtitle}`
+              : currentCurriculum.tagline}
           </p>
 
           {/* Progress Track in Aqua Mint (#54D6C3) */}
           <div className="flex flex-col gap-1.5 pt-2 max-w-md">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-[#A9A8BA]">Level 2 Progression</span>
-              <span className="font-mono font-bold text-[#54D6C3]">50% Completed</span>
+              <span className="text-[#A9A8BA]">Master Curriculum Progression</span>
+              <span className="font-mono font-bold text-[#54D6C3]">Active Stage 1</span>
             </div>
-            {/* Progress bar */}
             <div className="w-full h-2 rounded-full bg-[#0D0E17] border border-[#303348] overflow-hidden">
               <div
                 className="h-full bg-[#54D6C3] rounded-full transition-all duration-500 shadow-[0_0_8px_#54D6C3]"
-                style={{ width: '50%' }}
+                style={{ width: '42%' }}
               />
             </div>
           </div>
         </div>
 
-        {/* Quick Launch CTA */}
+        {/* Action CTAs */}
         <div className="z-10 flex flex-col sm:flex-row lg:flex-col gap-3 w-full sm:w-auto shrink-0">
+          {activeInstrument === 'guitar' && (
+            <button
+              onClick={handleStartDailyClass}
+              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#FF8066] to-[#E889A5] hover:brightness-110 text-[#0D0E17] font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#FF8066]/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Zap className="w-4 h-4 fill-current text-[#0D0E17]" />
+              <span>START TODAY'S CLASS</span>
+            </button>
+          )}
+
           <button
             onClick={() => onStartPractice(activeExercise?.id)}
-            className="px-6 py-3.5 rounded-xl bg-[#8067FF] hover:bg-[#6952E6] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#8067FF]/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="px-6 py-3 rounded-xl bg-[#8067FF] hover:bg-[#6952E6] text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-lg shadow-[#8067FF]/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             <Play className="w-4 h-4 fill-current" />
             <span>Launch 3-Step Practice</span>
@@ -99,13 +158,119 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           <button
             onClick={onOpenCurriculum}
-            className="px-5 py-3 rounded-xl bg-[#1D2032] hover:bg-[#303348] text-[#F6F4FF] font-medium text-xs border border-[#303348] flex items-center justify-center gap-2 transition-colors"
+            className="px-5 py-2.5 rounded-xl bg-[#1D2032] hover:bg-[#303348] text-[#F6F4FF] font-medium text-xs border border-[#303348] flex items-center justify-center gap-2 transition-colors"
           >
             <span>Explore Practice Map</span>
             <ArrowRight className="w-3.5 h-3.5 text-[#A9A8BA]" />
           </button>
         </div>
       </section>
+
+      {/* 14-DIMENSION VIBEX SKILL PROFILE (For Guitar) */}
+      {activeInstrument === 'guitar' && (
+        <section className="rounded-2xl bg-[#151725] border border-[#303348] p-6 flex flex-col gap-6 shadow-xl">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#303348] pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#8067FF]" />
+                <h3 className="text-base sm:text-lg font-bold text-[#F6F4FF]">
+                  14-Dimension VIBEX Skill Profile
+                </h3>
+              </div>
+              <p className="text-xs text-[#A9A8BA] mt-1">
+                Real-time tracking of technique, ear, fretboard, repertoire, and musicianship
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs">
+              <span className="px-3 py-1 rounded-full bg-[#54D6C3]/15 border border-[#54D6C3]/30 text-[#54D6C3] font-semibold">
+                Strengths: {diagnosis.strengths.map((s) => s.label).join(', ')}
+              </span>
+            </div>
+          </div>
+
+          {/* VIBE Adaptive Recommendation Callout */}
+          <div className="p-4 rounded-xl bg-gradient-to-r from-[#1D2032] to-[#151725] border border-[#8067FF]/30 flex items-start gap-3">
+            <Sparkles className="w-5 h-5 text-[#8067FF] shrink-0 mt-0.5" />
+            <div className="text-xs leading-relaxed text-[#E2E1EC]">
+              <span className="font-bold text-[#F6F4FF]">VIBE Adaptive Diagnosis: </span>
+              <span>{diagnosis.vibeRecommendation}</span>
+            </div>
+          </div>
+
+          {/* 14 Skills Progress Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
+            {SKILL_CATEGORIES_METADATA.map((cat) => {
+              const score = skillProfile[cat.key];
+              const percent = (score / 10) * 100;
+
+              return (
+                <div
+                  key={cat.key}
+                  className="p-3 rounded-xl bg-[#0D0E17] border border-[#303348] flex flex-col justify-between gap-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-[#F6F4FF] line-clamp-1">
+                      {cat.label}
+                    </span>
+                    <span
+                      className="font-mono text-xs font-bold"
+                      style={{ color: cat.color }}
+                    >
+                      {score}/10
+                    </span>
+                  </div>
+
+                  <div className="w-full h-1.5 rounded-full bg-[#1D2032] overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-300"
+                      style={{
+                        width: `${percent}%`,
+                        backgroundColor: cat.color,
+                        boxShadow: `0 0 6px ${cat.color}`,
+                      }}
+                    />
+                  </div>
+
+                  <span className="text-[10px] text-[#A9A8BA] line-clamp-1">
+                    {cat.description}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Quick Labs Launchers */}
+          <div className="pt-2 border-t border-[#303348] flex flex-wrap items-center justify-between gap-3">
+            <span className="text-xs text-[#A9A8BA]">Interactive Exploration Labs:</span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsAnatomyOpen(true)}
+                className="px-3.5 py-1.5 rounded-xl bg-[#1D2032] hover:bg-[#303348] border border-[#303348] text-xs font-semibold text-[#F6F4FF] flex items-center gap-1.5 transition-colors"
+              >
+                <Compass className="w-4 h-4 text-[#FF8066]" />
+                <span>Guitar Anatomy Explorer</span>
+              </button>
+
+              <button
+                onClick={() => setIsFretboardLabOpen(true)}
+                className="px-3.5 py-1.5 rounded-xl bg-[#1D2032] hover:bg-[#303348] border border-[#303348] text-xs font-semibold text-[#F6F4FF] flex items-center gap-1.5 transition-colors"
+              >
+                <Layers className="w-4 h-4 text-[#54D6C3]" />
+                <span>Master Fretboard Lab</span>
+              </button>
+
+              <button
+                onClick={() => handleLaunchTargetedLesson(MASTER_GUITAR_LESSONS[6])} // Level 6.1 C Major
+                className="px-3.5 py-1.5 rounded-xl bg-[#8067FF]/20 hover:bg-[#8067FF]/30 border border-[#8067FF]/40 text-xs font-bold text-[#8067FF] flex items-center gap-1.5 transition-colors"
+              >
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>Play C Major Lesson</span>
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 4 Instrument Selector Cards */}
       <section className="flex flex-col gap-4">
@@ -136,7 +301,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     : 'border-[#303348] hover:border-[#8067FF]/50'
                 }`}
               >
-                {/* Visual Header Image with Fallback */}
                 <div className="relative w-full h-32 bg-[#0D0E17] overflow-hidden">
                   <img
                     src={imgSrc}
@@ -146,7 +310,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#151725] via-transparent to-transparent opacity-80" />
 
-                  {/* Active Indicator Badge */}
                   {isSelected && (
                     <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded bg-[#8067FF] text-white text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shadow">
                       <CheckCircle2 className="w-3 h-3" />
@@ -155,7 +318,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   )}
                 </div>
 
-                {/* Card Body */}
                 <div className="p-4 flex flex-col flex-1 justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
@@ -171,7 +333,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </div>
 
                   <div className="pt-2 border-t border-[#303348]/60 flex items-center justify-between text-xs">
-                    <span className="text-[#A9A8BA]">5 Mastery Levels</span>
+                    <span className="text-[#A9A8BA]">Levels 0 to 48</span>
                     <span
                       className="font-medium group-hover:translate-x-0.5 transition-transform"
                       style={{ color: inst.accent }}
@@ -186,11 +348,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
       </section>
 
-      {/* Recommended Song Spotlight (Coral Orange #FF8066) & Practice Telemetry */}
+      {/* Recommended Song Spotlight & Consistency Telemetry */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-        {/* Recommended Repertoire Card (Highlighted in Coral Orange) */}
         <div className="lg:col-span-2 rounded-xl bg-[#151725] border-2 border-[#FF8066]/50 p-6 flex flex-col justify-between gap-4 shadow-lg shadow-[#FF8066]/5 relative overflow-hidden">
-          {/* Subtle Corner Glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#FF8066]/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="flex flex-col gap-2 z-10">
@@ -233,7 +393,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
 
-        {/* Practice Telemetry & Consistency Card */}
+        {/* Practice Telemetry */}
         <div className="rounded-xl bg-[#151725] border border-[#303348] p-6 flex flex-col justify-between gap-4">
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
@@ -276,10 +436,173 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           <div className="p-3 rounded-lg bg-[#1D2032] border border-[#303348] flex items-center gap-2 text-xs text-[#A9A8BA]">
             <Target className="w-4 h-4 text-[#54D6C3] shrink-0" />
-            <span>Next milestone: Unlock Level 3 at 800 XP for {currentCurriculum.displayName}</span>
+            <span>Grandmaster Goal: Level 48 Capstone Studio Certification</span>
           </div>
         </div>
       </section>
+
+      {/* DAILY CLASS ADAPTIVE SESSION MODAL */}
+      {dailyClassModalOpen && dailySessionData && (
+        <div className="fixed inset-0 z-50 bg-[#0D0E17]/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-2xl bg-[#151725] border border-[#303348] rounded-3xl p-6 sm:p-7 flex flex-col gap-6 shadow-2xl animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-[#303348] pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FF8066] to-[#E889A5] flex items-center justify-center text-[#0D0E17] font-bold shadow-lg shadow-[#FF8066]/20">
+                  <Zap className="w-6 h-6 fill-current" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-[#FF8066] uppercase tracking-wider font-mono">
+                      VIBE DAILY STUDIO CLASS
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-[#303348] text-[#A9A8BA] font-mono">
+                      {dailySessionData.date}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-extrabold text-[#F6F4FF] mt-0.5">
+                    Tailored 6-Part Mastery Routine
+                  </h3>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setDailyClassModalOpen(false)}
+                className="p-1.5 rounded-lg text-[#A9A8BA] hover:text-[#F6F4FF] hover:bg-[#1D2032]"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Welcome & Diagnosis Message */}
+            <div className="p-4 rounded-2xl bg-[#0D0E17] border border-[#8067FF]/30 text-xs sm:text-sm text-[#E2E1EC] leading-relaxed">
+              {dailySessionData.welcomeMessage}
+            </div>
+
+            {/* Routine Steps List */}
+            <div className="flex flex-col gap-2.5">
+              <div className="p-3 rounded-xl bg-[#1D2032] border border-[#303348] flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#8067FF]/20 text-[#8067FF] font-bold flex items-center justify-center text-[10px]">
+                    1
+                  </span>
+                  <span className="font-semibold text-[#F6F4FF]">Warm-Up: Spider Stretch & Finger Independence</span>
+                </div>
+                <span className="text-[#A9A8BA] font-mono">5 min</span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#1D2032] border border-[#303348] flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#54D6C3]/20 text-[#54D6C3] font-bold flex items-center justify-center text-[10px]">
+                    2
+                  </span>
+                  <span className="font-semibold text-[#F6F4FF]">Revision: Open Chords Intonation & Clarity</span>
+                </div>
+                <span className="text-[#A9A8BA] font-mono">5 min</span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#1D2032] border border-[#303348] flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#2BD2FF]/20 text-[#2BD2FF] font-bold flex items-center justify-center text-[10px]">
+                    3
+                  </span>
+                  <span className="font-semibold text-[#F6F4FF]">Weak-Skill Workout: Ear Training & Fretboard Synchronization</span>
+                </div>
+                <span className="text-[#A9A8BA] font-mono">5 min</span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#FF8066]/15 border border-[#FF8066]/40 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#FF8066] text-[#0D0E17] font-bold flex items-center justify-center text-[10px]">
+                    4
+                  </span>
+                  <div>
+                    <span className="font-bold text-[#F6F4FF] block">
+                      New Concept: {dailySessionData.newConceptLesson.title}
+                    </span>
+                    <span className="text-[#FF8066] text-[11px]">
+                      Level {dailySessionData.newConceptLesson.lessonNumber} · {dailySessionData.newConceptLesson.subtitle}
+                    </span>
+                  </div>
+                </div>
+                <span className="text-[#FF8066] font-mono font-bold">10 min</span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#1D2032] border border-[#303348] flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#FBBF24]/20 text-[#FBBF24] font-bold flex items-center justify-center text-[10px]">
+                    5
+                  </span>
+                  <span className="font-semibold text-[#F6F4FF]">
+                    Song Application: {dailySessionData.songApplicationTitle}
+                  </span>
+                </div>
+                <span className="text-[#A9A8BA] font-mono">5 min</span>
+              </div>
+            </div>
+
+            {/* Launch Daily Class Session */}
+            <div className="flex items-center justify-between pt-2 border-t border-[#303348]">
+              <div className="flex items-center gap-2 text-xs font-mono text-[#F4BB55]">
+                <Award className="w-4 h-4" />
+                <span>+{dailySessionData.estimatedXp} XP for Completion</span>
+              </div>
+
+              <button
+                onClick={() => handleLaunchTargetedLesson(dailySessionData.newConceptLesson)}
+                className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#FF8066] to-[#E889A5] hover:brightness-110 text-[#0D0E17] font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-[#FF8066]/30 transition-all hover:scale-[1.02]"
+              >
+                <span>Enter Guided Studio Session</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* GUITAR ANATOMY EXPLORER MODAL */}
+      {isAnatomyOpen && (
+        <div className="fixed inset-0 z-50 bg-[#0D0E17]/90 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-4xl max-h-[92vh] overflow-y-auto">
+            <GuitarAnatomyExplorer onClose={() => setIsAnatomyOpen(false)} />
+          </div>
+        </div>
+      )}
+
+      {/* MASTER FRETBOARD LAB MODAL */}
+      {isFretboardLabOpen && (
+        <div className="fixed inset-0 z-50 bg-[#0D0E17]/90 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-4xl bg-[#151725] border border-[#303348] rounded-3xl p-6 flex flex-col gap-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[#303348] pb-3">
+              <div className="flex items-center gap-2">
+                <Layers className="w-5 h-5 text-[#54D6C3]" />
+                <h3 className="text-base font-bold text-[#F6F4FF]">
+                  Master Guitar Fretboard Free Lab
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsFretboardLabOpen(false)}
+                className="p-1 rounded-lg text-[#A9A8BA] hover:text-[#F6F4FF]"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <MasterGuitarFretboard interactive={true} />
+          </div>
+        </div>
+      )}
+
+      {/* INTERACTIVE LESSON RUNNER MODAL */}
+      {activeLesson && (
+        <InteractiveLessonRunner
+          lesson={activeLesson}
+          onComplete={(rec) => {
+            setActiveLesson(null);
+          }}
+          onClose={() => setActiveLesson(null)}
+        />
+      )}
     </div>
   );
 };

@@ -16,6 +16,11 @@ import {
   LESSON_TUTORIALS,
   EAR_TRAINING_QUESTIONS,
 } from '../data/curriculumData';
+import { MASTER_GUITAR_LESSONS } from '../data/guitarMasterCurriculum';
+import { MasterGuitarLesson } from '../types/guitarCurriculum';
+import { InteractiveLessonRunner } from '../components/lessons/InteractiveLessonRunner';
+import { GuitarAnatomyExplorer } from '../components/lessons/GuitarAnatomyExplorer';
+import { MasterGuitarFretboard } from '../components/instruments/MasterGuitarFretboard';
 import { EarTrainingGymView } from './EarTrainingGymView';
 import {
   Lock,
@@ -57,6 +62,38 @@ export const PracticeMapView: React.FC<PracticeMapViewProps> = ({
   const [modalMode, setModalMode] = useState<'watch' | 'your_turn'>('watch');
   const [activeEarGymQuestion, setActiveEarGymQuestion] = useState<EarTrainingQuestion | null>(null);
   const [isEarGymOpen, setIsEarGymOpen] = useState<boolean>(false);
+  const [activeInteractiveLesson, setActiveInteractiveLesson] = useState<MasterGuitarLesson | null>(null);
+  const [isAnatomyOpen, setIsAnatomyOpen] = useState<boolean>(false);
+  const [isFretboardLabOpen, setIsFretboardLabOpen] = useState<boolean>(false);
+
+  const findMatchingGuitarLesson = (node: PracticeNode): MasterGuitarLesson => {
+    const text = (node.title + ' ' + (node.subtitle || '')).toLowerCase();
+    if (text.includes('anatomy') || text.includes('part') || text.includes('nut')) {
+      return MASTER_GUITAR_LESSONS[1];
+    }
+    if (text.includes('orientation') || text.includes('what is')) {
+      return MASTER_GUITAR_LESSONS[0];
+    }
+    if (text.includes('posture') || text.includes('sitting')) {
+      return MASTER_GUITAR_LESSONS[2];
+    }
+    if (text.includes('left-hand') || text.includes('knuckle') || text.includes('finger curvature')) {
+      return MASTER_GUITAR_LESSONS[3];
+    }
+    if (text.includes('six string') || text.includes('string') || text.includes('tuning')) {
+      return MASTER_GUITAR_LESSONS[4];
+    }
+    if (text.includes('spider') || text.includes('1-2-3-4')) {
+      return MASTER_GUITAR_LESSONS[5];
+    }
+    if (text.includes('pentatonic') || text.includes('scale') || text.includes('box 1')) {
+      return MASTER_GUITAR_LESSONS[7];
+    }
+    if (text.includes('boss') || text.includes('virtuoso') || text.includes('professional') || node.type === 'boss') {
+      return MASTER_GUITAR_LESSONS[8];
+    }
+    return MASTER_GUITAR_LESSONS[6]; // C Major
+  };
 
   // Filter or group by level
   const levels = [1, 2, 3, 4, 5];
@@ -110,6 +147,26 @@ export const PracticeMapView: React.FC<PracticeMapViewProps> = ({
         </div>
 
         <div className="flex items-center gap-2 self-stretch md:self-auto">
+          {/* Instrument Specific Explorer Tools */}
+          {activeInstrument === 'guitar' && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsAnatomyOpen(true)}
+                className="px-3 py-1.5 rounded-xl bg-[#151725] hover:bg-[#1D2032] border border-[#303348] text-xs font-semibold text-[#F6F4FF] flex items-center gap-1.5 transition-colors"
+              >
+                <Compass className="w-3.5 h-3.5 text-[#FF8066]" />
+                <span className="hidden sm:inline">Anatomy</span>
+              </button>
+              <button
+                onClick={() => setIsFretboardLabOpen(true)}
+                className="px-3 py-1.5 rounded-xl bg-[#151725] hover:bg-[#1D2032] border border-[#303348] text-xs font-semibold text-[#F6F4FF] flex items-center gap-1.5 transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#54D6C3]" />
+                <span className="hidden sm:inline">Fretboard</span>
+              </button>
+            </div>
+          )}
+
           {/* Level Filter Chips */}
           <div className="flex items-center p-1 bg-[#151725] rounded-xl border border-[#303348] text-xs">
             <button
@@ -451,19 +508,35 @@ export const PracticeMapView: React.FC<PracticeMapViewProps> = ({
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between pt-2 border-t border-[#303348] mt-2">
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#303348] mt-2">
                     <span className="text-xs text-[#A9A8BA] flex items-center gap-1.5">
                       <Clock className="w-4 h-4" />
                       <span>{selectedNode.durationMinutes} min lesson</span>
                     </span>
 
-                    <button
-                      onClick={() => setModalMode('your_turn')}
-                      className="px-4 py-2 rounded-xl bg-[#8067FF] hover:bg-[#6c51ff] text-[#F6F4FF] text-xs font-semibold transition-colors flex items-center gap-2"
-                    >
-                      <span>Proceed to Your Turn</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {activeInstrument === 'guitar' && (
+                        <button
+                          onClick={() => {
+                            const match = findMatchingGuitarLesson(selectedNode);
+                            setSelectedNode(null);
+                            setActiveInteractiveLesson(match);
+                          }}
+                          className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#FF8066] to-[#E889A5] hover:brightness-110 text-[#0D0E17] font-extrabold text-xs transition-all shadow-md shadow-[#FF8066]/20 flex items-center gap-1.5"
+                        >
+                          <Sparkles className="w-3.5 h-3.5 fill-current" />
+                          <span>Launch Interactive Lesson</span>
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => setModalMode('your_turn')}
+                        className="px-4 py-2 rounded-xl bg-[#8067FF] hover:bg-[#6c51ff] text-[#F6F4FF] text-xs font-semibold transition-colors flex items-center gap-2"
+                      >
+                        <span>Proceed to Your Turn</span>
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -495,7 +568,7 @@ export const PracticeMapView: React.FC<PracticeMapViewProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-[#303348] mt-2">
+                  <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#303348] mt-2">
                     <button
                       onClick={() => setModalMode('watch')}
                       className="text-xs text-[#A9A8BA] hover:text-[#F6F4FF] transition-colors"
@@ -503,21 +576,81 @@ export const PracticeMapView: React.FC<PracticeMapViewProps> = ({
                       ← Back to Tutorial
                     </button>
 
-                    <button
-                      onClick={() => {
-                        const exId = selectedNode.exerciseId || 'guitar-l1-ex1';
-                        setSelectedNode(null);
-                        onSelectExercise(exId);
-                      }}
-                      className="px-6 py-2.5 rounded-xl bg-[#45D483] hover:bg-[#3bc275] text-[#0D0E17] font-extrabold text-xs transition-all shadow-lg hover:shadow-[#45D483]/20 flex items-center gap-2"
-                    >
-                      <Play className="w-4 h-4 fill-current" />
-                      <span>Start Practice Room</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {activeInstrument === 'guitar' && (
+                        <button
+                          onClick={() => {
+                            const match = findMatchingGuitarLesson(selectedNode);
+                            setSelectedNode(null);
+                            setActiveInteractiveLesson(match);
+                          }}
+                          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#FF8066] to-[#E889A5] hover:brightness-110 text-[#0D0E17] font-extrabold text-xs transition-all shadow-lg shadow-[#FF8066]/20 flex items-center gap-2"
+                        >
+                          <Sparkles className="w-4 h-4 fill-current" />
+                          <span>Launch Interactive Teacher Session</span>
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => {
+                          const exId = selectedNode.exerciseId || 'guitar-l1-ex1';
+                          setSelectedNode(null);
+                          onSelectExercise(exId);
+                        }}
+                        className="px-5 py-2.5 rounded-xl bg-[#45D483] hover:bg-[#3bc275] text-[#0D0E17] font-extrabold text-xs transition-all shadow-lg hover:shadow-[#45D483]/20 flex items-center gap-2"
+                      >
+                        <Play className="w-4 h-4 fill-current" />
+                        <span>Start Practice Room</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Interactive Guitar Lesson Runner */}
+      {activeInteractiveLesson && (
+        <InteractiveLessonRunner
+          lesson={activeInteractiveLesson}
+          onComplete={(record) => {
+            setActiveInteractiveLesson(null);
+          }}
+          onClose={() => setActiveInteractiveLesson(null)}
+        />
+      )}
+
+      {/* Guitar Anatomy Modal */}
+      {isAnatomyOpen && (
+        <div className="fixed inset-0 z-50 bg-[#0D0E17]/90 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-4xl max-h-[92vh] overflow-y-auto">
+            <GuitarAnatomyExplorer onClose={() => setIsAnatomyOpen(false)} />
+          </div>
+        </div>
+      )}
+
+      {/* Guitar Fretboard Lab Modal */}
+      {isFretboardLabOpen && (
+        <div className="fixed inset-0 z-50 bg-[#0D0E17]/90 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-4xl bg-[#151725] border border-[#303348] rounded-3xl p-6 flex flex-col gap-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[#303348] pb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#54D6C3]" />
+                <h3 className="text-base font-bold text-[#F6F4FF]">
+                  Master Guitar Fretboard Lab
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsFretboardLabOpen(false)}
+                className="p-1 rounded-lg text-[#A9A8BA] hover:text-[#F6F4FF]"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <MasterGuitarFretboard interactive={true} />
           </div>
         </div>
       )}
