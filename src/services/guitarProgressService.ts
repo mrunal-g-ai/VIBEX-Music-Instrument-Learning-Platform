@@ -101,6 +101,13 @@ export const PRACTICEABLE_SKILLS_REGISTRY = [
 
 const INITIAL_ACHIEVEMENTS: AchievementItem[] = [
   {
+    id: 'first_step',
+    title: 'First Step',
+    description: 'Completed Lesson 1.1: What is a Guitar?',
+    isUnlocked: false,
+    icon: 'Sparkles',
+  },
+  {
     id: 'first_chord',
     title: 'First Complete Chord',
     description: 'Learned and played your first complete guitar chord cleanly.',
@@ -369,93 +376,6 @@ export class GuitarProgressService {
       bpm,
       cleanRepetitions: Math.round(bpm * 0.4),
     });
-  }
-
-  // ==========================================
-  // PRACTICEABLE SKILLS ENGINE (MY SKILLS)
-  // ==========================================
-  public getPracticeSkills(): PracticeSkillItem[] {
-    const stats = this.getPracticeSkillStats();
-
-    return PRACTICEABLE_SKILLS_REGISTRY.map((reg) => {
-      const lessonStatus = this.getLessonStatus(reg.prerequisiteLessonId);
-      const isLearned = lessonStatus === 'completed';
-      const stat = stats[reg.id] || { practiceCount: 0, bestBpm: reg.defaultBpm };
-
-      let status: PracticeSkillStatus = 'NOT_LEARNED';
-      if (isLearned) {
-        if (stat.practiceCount >= 8 && (reg.isSpeedBased ? (stat.bestBpm || 0) >= 80 : true)) {
-          status = 'MASTERED';
-        } else if (stat.practiceCount >= 4) {
-          status = 'IMPROVING';
-        } else if (stat.practiceCount >= 1) {
-          status = 'PRACTICING';
-        } else {
-          status = 'LEARNED';
-        }
-      }
-
-      return {
-        id: reg.id,
-        skillName: reg.skillName,
-        category: reg.category,
-        description: reg.description,
-        status,
-        prerequisiteLessonId: reg.prerequisiteLessonId,
-        practiceCount: stat.practiceCount || 0,
-        bestBpm: reg.isSpeedBased ? stat.bestBpm || reg.defaultBpm : undefined,
-        isSpeedBased: reg.isSpeedBased,
-        lastPracticedDate: stat.lastPracticedDate,
-      };
-    });
-  }
-
-  private getPracticeSkillStats(): Record<string, { practiceCount: number; bestBpm?: number; lastPracticedDate?: string }> {
-    if (typeof window === 'undefined') return {};
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY_PRACTICE_SKILL_STATS);
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // fallback
-    }
-    return {};
-  }
-
-  public recordPracticeSkill(skillId: string, durationMinutes: number, bpm?: number, reps?: number): void {
-    const stats = this.getPracticeSkillStats();
-    const current = stats[skillId] || { practiceCount: 0 };
-    current.practiceCount += 1;
-    current.lastPracticedDate = new Date().toISOString();
-    if (bpm) {
-      current.bestBpm = Math.max(current.bestBpm || 0, bpm);
-    }
-    stats[skillId] = current;
-
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem(STORAGE_KEY_PRACTICE_SKILL_STATS, JSON.stringify(stats));
-      } catch {
-        // ignore
-      }
-    }
-
-    const reg = PRACTICEABLE_SKILLS_REGISTRY.find((r) => r.id === skillId);
-    if (reg) {
-      this.recordPracticeSession({
-        exerciseName: reg.skillName,
-        category: reg.category,
-        durationMinutes,
-        bpm,
-        cleanRepetitions: reps,
-      });
-
-      if (skillId === 'c_major_chord' || skillId === 'e_minor_chord' || skillId === 'g_major_chord') {
-        this.unlockAchievement('first_chord');
-      }
-      if (skillId === 'folk_strumming') {
-        this.unlockAchievement('rhythm_keeper');
-      }
-    }
   }
 
   // ==========================================

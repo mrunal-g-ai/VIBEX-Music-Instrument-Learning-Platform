@@ -622,4 +622,132 @@ export class VibexAudioEngine {
       this.mediaRecorder.stop();
     });
   }
+
+  // ==========================================
+  // TIMBRE DEMONSTRATION & REWARD CHIMES
+  // ==========================================
+  public playGuitarTimbre(
+    type: 'acoustic' | 'electric' | 'classical',
+    frequency: number = 196.0,
+    durationMs: number = 1400
+  ): void {
+    const ctx = this.getAudioContext();
+    const now = ctx.currentTime;
+    const durSec = durationMs / 1000;
+
+    switch (type) {
+      case 'acoustic': {
+        // Steel string acoustic: crisp attack + wooden body cavity resonance
+        const osc = ctx.createOscillator();
+        const oscSub = ctx.createOscillator();
+        const bodyResonance = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(frequency, now);
+
+        oscSub.type = 'triangle';
+        oscSub.frequency.setValueAtTime(frequency * 2, now);
+
+        bodyResonance.type = 'bandpass';
+        bodyResonance.frequency.setValueAtTime(450, now);
+        bodyResonance.Q.setValueAtTime(1.5, now);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.5, now + 0.006);
+        gain.gain.exponentialRampToValueAtTime(0.2, now + 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + durSec);
+
+        osc.connect(gain);
+        oscSub.connect(bodyResonance);
+        bodyResonance.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        oscSub.start(now);
+        osc.stop(now + durSec);
+        oscSub.stop(now + durSec);
+        break;
+      }
+
+      case 'electric': {
+        // Electric guitar: magnetic pickup harmonics + sustained amp character
+        const osc = ctx.createOscillator();
+        const pickupTone = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(frequency, now);
+
+        pickupTone.type = 'lowpass';
+        pickupTone.frequency.setValueAtTime(2800, now);
+
+        // Extended sustain characteristic of amplified electric guitar
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.45, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.35, now + 0.3);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + durSec * 1.3);
+
+        osc.connect(pickupTone);
+        pickupTone.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + durSec * 1.3);
+        break;
+      }
+
+      case 'classical': {
+        // Classical nylon: soft mellow finger attack + warm round fundamental
+        const osc = ctx.createOscillator();
+        const warmFilter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(frequency, now);
+
+        warmFilter.type = 'lowpass';
+        warmFilter.frequency.setValueAtTime(1200, now);
+
+        // Softer finger-flesh attack and round decay
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.55, now + 0.025);
+        gain.gain.exponentialRampToValueAtTime(0.18, now + 0.2);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + durSec);
+
+        osc.connect(warmFilter);
+        warmFilter.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + durSec);
+        break;
+      }
+    }
+  }
+
+  public playCelebrationChime(): void {
+    const ctx = this.getAudioContext();
+    const now = ctx.currentTime;
+    // C5, E5, G5, C6 triumphant ascending arpeggio
+    const chord = [523.25, 659.25, 783.99, 1046.5];
+
+    chord.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+
+      gain.gain.setValueAtTime(0.0001, now + idx * 0.1);
+      gain.gain.linearRampToValueAtTime(0.3, now + idx * 0.1 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.1 + 0.9);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now + idx * 0.1);
+      osc.stop(now + idx * 0.1 + 0.9);
+    });
+  }
 }

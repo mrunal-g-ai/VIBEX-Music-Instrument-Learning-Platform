@@ -8,6 +8,8 @@ import { GUITAR_MODULES } from '../data/guitarStructuredCurriculum';
 import { GuitarLesson, LessonStatus } from '../types/guitarLessons';
 import { GuitarProgressService } from '../services/guitarProgressService';
 import { FullScreenLessonView } from '../components/lessons/FullScreenLessonView';
+import { GamifiedLearningMap } from '../components/lessons/GamifiedLearningMap';
+import { Lesson1_1Player } from '../components/lessons/Lesson1_1Player';
 import {
   BookOpen,
   CheckCircle2,
@@ -29,7 +31,8 @@ interface LearnViewProps {
 export const LearnView: React.FC<LearnViewProps> = ({ onNavigateToPractice }) => {
   const [selectedLessonForPreview, setSelectedLessonForPreview] = useState<GuitarLesson | null>(null);
   const [activeFullScreenLesson, setActiveFullScreenLesson] = useState<GuitarLesson | null>(null);
-  const [activeCategoryFilter, setActiveCategoryFilter] = useState<string>('all');
+  const [activeLesson1_1, setActiveLesson1_1] = useState<boolean>(false);
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
   const progressService = GuitarProgressService.getInstance();
 
@@ -50,97 +53,34 @@ export const LearnView: React.FC<LearnViewProps> = ({ onNavigateToPractice }) =>
     }
   };
 
+  const handleSelectLesson = (lesson: GuitarLesson) => {
+    if (lesson.id === 'lesson_1_1') {
+      setActiveLesson1_1(true);
+    } else {
+      setSelectedLessonForPreview(lesson);
+    }
+  };
+
   return (
-    <div className="w-full flex flex-col gap-8 pb-20 text-[#F6F4FF]">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#303348] pb-5">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#8067FF]" />
-            <span className="text-xs font-mono font-bold text-[#8067FF] uppercase tracking-wider">
-              STRUCTURED CURRICULUM
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F6F4FF] tracking-tight mt-1">
-            Guitar Learning Path
-          </h1>
-          <p className="text-xs text-[#A9A8BA] mt-0.5">
-            Teacher-led structured guitar curriculum from Absolute Beginner to Mastery.
-          </p>
-        </div>
-      </div>
+    <div className="w-full flex flex-col gap-6 text-[#F6F4FF]">
+      {/* Gamified Guitar Learning Map */}
+      <GamifiedLearningMap
+        modules={GUITAR_MODULES}
+        getLessonStatus={getLessonStatus}
+        onSelectLesson={handleSelectLesson}
+      />
 
-      {/* Modules and Lessons List */}
-      <div className="flex flex-col gap-10">
-        {GUITAR_MODULES.map((module) => (
-          <div key={module.id} className="flex flex-col gap-4">
-            {/* Module Header Bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#303348]/60 pb-2">
-              <div className="flex items-center gap-2.5">
-                <span className="px-2.5 py-0.5 rounded-md bg-[#8067FF]/20 text-[#8067FF] font-mono text-xs font-bold">
-                  Module {module.moduleNumber}
-                </span>
-                <h2 className="text-lg font-bold text-[#F6F4FF]">{module.title}</h2>
-              </div>
-              <p className="text-xs text-[#A9A8BA]">{module.description}</p>
-            </div>
-
-            {/* Lesson Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {module.lessons.map((lesson) => {
-                const status = getLessonStatus(lesson.id);
-                const badge = getStatusBadge(status);
-
-                let actionLabel = 'Start Lesson';
-                if (status === 'in_progress') actionLabel = 'Continue Lesson';
-                else if (status === 'completed') actionLabel = 'Review Lesson';
-                else if (status === 'mastered') actionLabel = 'Practice Skill';
-
-                return (
-                  <div
-                    key={lesson.id}
-                    onClick={() => setSelectedLessonForPreview(lesson)}
-                    className="p-5 rounded-2xl bg-[#151725] border border-[#303348] hover:border-[#8067FF] cursor-pointer flex flex-col justify-between gap-4 transition-all duration-200 shadow-md group"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="text-[10px] font-mono font-bold text-[#A9A8BA]">
-                          Lesson {lesson.lessonNumber}
-                        </span>
-                        <span
-                          className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono"
-                          style={{ color: badge.color, backgroundColor: badge.bg }}
-                        >
-                          {badge.label}
-                        </span>
-                      </div>
-
-                      <h3 className="text-base font-bold text-[#F6F4FF] group-hover:text-[#FF8066] transition-colors">
-                        {lesson.title}
-                      </h3>
-                      <p className="text-xs text-[#A9A8BA] mt-1 line-clamp-2 leading-relaxed">
-                        {lesson.subtitle}
-                      </p>
-                    </div>
-
-                    <div className="pt-3 border-t border-[#303348]/60 flex items-center justify-between text-xs text-[#A9A8BA]">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>{lesson.durationMinutes} min</span>
-                      </span>
-
-                      <span className="font-semibold text-[#8067FF] group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                        <span>{actionLabel}</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* FULL-SCREEN LEVEL 1.1 INTERACTIVE EXPERIENCE */}
+      {activeLesson1_1 && (
+        <Lesson1_1Player
+          onClose={() => setActiveLesson1_1(false)}
+          onComplete={() => {
+            setActiveLesson1_1(false);
+            setRefreshTrigger((prev) => prev + 1);
+          }}
+          onNavigateToPractice={onNavigateToPractice}
+        />
+      )}
 
       {/* LESSON DETAIL PREVIEW MODAL (Section 53) */}
       {selectedLessonForPreview && (

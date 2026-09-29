@@ -128,7 +128,7 @@ export interface GuitarSongItem {
 export interface PracticeSessionRecord {
   id: string;
   exerciseName: string;
-  category: 'Technique' | 'Chords' | 'Rhythm' | 'Speed Lab' | 'Songs' | 'Free Play';
+  category: 'Technique' | 'Chords' | 'Rhythm' | 'Chord Changes' | 'Speed Lab' | 'Songs' | 'Free Play';
   durationMinutes: number;
   bpm?: number;
   cleanRepetitions?: number;
