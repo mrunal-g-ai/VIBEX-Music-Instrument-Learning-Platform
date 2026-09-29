@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useState } from 'react';
+import { useInstrument } from '../contexts/InstrumentContext';
+import { InstrumentType } from '../types/vibex';
 import { GuitarProgressService } from '../services/guitarProgressService';
 import { VibeTeacherEngine, SKILL_CATEGORIES_METADATA } from '../services/vibeTeacherEngine';
 import {
@@ -16,6 +18,7 @@ import {
   Activity,
   Shield,
   Sliders,
+  X,
 } from 'lucide-react';
 
 interface ProfileViewProps {
@@ -36,8 +39,87 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ streakCount }) => {
 
   const totalPracticeMinutes = practiceSessions.reduce((acc, s) => acc + s.durationMinutes, 0);
 
+  const { activeInstrument, setActiveInstrument } = useInstrument();
+  const [isChangingInstrument, setIsChangingInstrument] = useState(false);
+
+  const instruments: { id: InstrumentType; name: string; icon: string; accent: string; available: boolean }[] = [
+    { id: 'guitar', name: 'Guitar', icon: '🎸', accent: '#FF8066', available: true },
+    { id: 'keyboard', name: 'Keyboard', icon: '🎹', accent: '#8067FF', available: false },
+    { id: 'violin', name: 'Violin', icon: '🎻', accent: '#E889A5', available: false },
+    { id: 'bansuri', name: 'Bansuri', icon: '🎋', accent: '#54D6C3', available: false },
+  ];
+
+  const currentInst = instruments.find(i => i.id === activeInstrument) || instruments[0];
+
   return (
     <div className="w-full max-w-5xl mx-auto flex flex-col gap-8 pb-20 text-[#F6F4FF]">
+      {/* Instrument Switcher UI */}
+      <div className="p-6 rounded-3xl bg-[#151725] border border-[#303348] shadow-xl">
+        {!isChangingInstrument ? (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <span className="text-[10px] font-mono font-bold text-[#A9A8BA] uppercase tracking-wider block mb-1">
+                Instrument
+              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{currentInst.icon}</span>
+                <h2 className="text-xl font-bold text-[#F6F4FF]" style={{ color: currentInst.accent }}>{currentInst.name}</h2>
+              </div>
+              <p className="text-xs text-[#A9A8BA] mt-1">
+                Your current learning instrument.
+              </p>
+            </div>
+            <button 
+              onClick={() => setIsChangingInstrument(true)}
+              className="px-5 py-2.5 rounded-xl border border-[#303348] hover:bg-[#1D2032] text-sm font-bold text-[#F6F4FF] transition-colors"
+            >
+              Change Instrument
+            </button>
+          </div>
+        ) : (
+          <div className="animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-[#F6F4FF]">Choose Your Instrument</h3>
+              <button 
+                onClick={() => setIsChangingInstrument(false)}
+                className="p-2 rounded-full hover:bg-[#1D2032] text-[#A9A8BA] transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {instruments.map(inst => (
+                <button
+                  key={inst.id}
+                  onClick={() => {
+                    setActiveInstrument(inst.id);
+                    setIsChangingInstrument(false);
+                  }}
+                  className={`p-4 rounded-2xl border text-left transition-all ${
+                    activeInstrument === inst.id
+                      ? `bg-[#1D2032] border-[${inst.accent}]`
+                      : 'bg-[#0D0E17] border-[#303348] hover:border-[#A9A8BA]/50'
+                  }`}
+                  style={{ borderColor: activeInstrument === inst.id ? inst.accent : undefined }}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{inst.icon}</span>
+                    <div>
+                      <h4 className="font-bold text-[#F6F4FF]">{inst.name}</h4>
+                      <p className="text-xs text-[#A9A8BA] mt-0.5">
+                        {inst.available ? 'Your active journey' : 'Coming soon'}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {activeInstrument === 'guitar' ? (
+        <>
       {/* 1. Profile Header & Current Stage */}
       <div className="p-6 sm:p-7 rounded-3xl bg-[#151725] border border-[#303348] flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 shadow-xl">
         <div className="flex items-center gap-4">
@@ -247,6 +329,18 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ streakCount }) => {
           ))}
         </div>
       </div>
+      </>
+      ) : (
+        <div className="p-12 rounded-3xl bg-[#151725] border border-[#303348] flex flex-col items-center justify-center text-center shadow-xl">
+          <span className="text-5xl mb-4">{currentInst.icon}</span>
+          <h2 className="text-2xl font-black text-[#F6F4FF] uppercase tracking-tight" style={{ color: currentInst.accent }}>
+            {currentInst.name}
+          </h2>
+          <p className="text-[#A9A8BA] mt-2 max-w-md mx-auto">
+            Learning path not available yet.
+          </p>
+        </div>
+      )}
     </div>
   );
 };

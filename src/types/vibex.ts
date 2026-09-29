@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export type InstrumentType = 'piano' | 'guitar' | 'violin' | 'bansuri';
+export type InstrumentType = 'guitar' | 'keyboard' | 'violin' | 'bansuri';
 
 export type TeachingStep = 'watch' | 'your_turn' | 'feedback';
 

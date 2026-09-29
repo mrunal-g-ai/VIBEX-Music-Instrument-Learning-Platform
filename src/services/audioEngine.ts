@@ -57,7 +57,7 @@ export class VibexAudioEngine {
     const durSec = durationMs / 1000;
 
     switch (instrument) {
-      case 'piano': {
+      case 'keyboard': {
         // Grand Piano physical modeling with 3 harmonic partials and soft hammer transient
         const fundamental = ctx.createOscillator();
         const overtone1 = ctx.createOscillator();
@@ -223,7 +223,7 @@ export class VibexAudioEngine {
   public playChord(frequencies: number[], durationMs: number = 1500): void {
     frequencies.forEach((freq, idx) => {
       setTimeout(() => {
-        this.playInstrumentNote('piano', freq, durationMs, 0.7);
+        this.playInstrumentNote('keyboard', freq, durationMs, 0.7);
       }, idx * 40); // slight strum/roll
     });
   }

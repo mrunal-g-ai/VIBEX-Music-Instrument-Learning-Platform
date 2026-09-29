@@ -51,7 +51,7 @@ export const EarTrainingGymView: React.FC<EarTrainingGymViewProps> = ({ onAddXp 
     } else {
       currentQuestion.targetFrequencies.forEach((freq, idx) => {
         setTimeout(() => {
-          audioEngine.playInstrumentNote('piano', freq, 1000);
+          audioEngine.playInstrumentNote('keyboard', freq, 1000);
         }, idx * 600);
       });
     }

@@ -7,6 +7,8 @@ import React, { useState, useEffect } from 'react';
 import { GUITAR_SONG_LIBRARY } from '../data/guitarStructuredCurriculum';
 import { GuitarSongItem } from '../types/guitarLessons';
 import { VibexAudioEngine } from '../services/audioEngine';
+import { useInstrument } from '../contexts/InstrumentContext';
+import { InstrumentEmptyState } from '../components/layout/InstrumentEmptyState';
 import { GuitarProgressService } from '../services/guitarProgressService';
 import { SpeechCoach } from '../services/speechCoach';
 import { MasterGuitarFretboard } from '../components/instruments/MasterGuitarFretboard';
@@ -168,6 +170,7 @@ export const SongsView: React.FC = () => {
 
   const audioEngine = VibexAudioEngine.getInstance();
   const progressService = GuitarProgressService.getInstance();
+  const { activeInstrument } = useInstrument();
 
   // Effective BPM
   const effectiveBpm = selectedSong ? Math.round(selectedSong.tempoBpm * tempoSpeedMultiplier) : 70;
@@ -246,6 +249,13 @@ export const SongsView: React.FC = () => {
   // ==========================================
   // VIEW 1: SONG SELECTION OVERVIEW
   // ==========================================
+  if (activeInstrument !== 'guitar') {
+    return <InstrumentEmptyState 
+      title={`${activeInstrument} Songs`} 
+      message={`The song library for ${activeInstrument} is coming soon.`}
+    />;
+  }
+
   if (!selectedSong) {
     return (
       <div className="w-full flex flex-col gap-6 pb-20 text-[#F6F4FF]">

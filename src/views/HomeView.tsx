@@ -4,6 +4,8 @@
  */
 
 import React from 'react';
+import { useInstrument } from '../contexts/InstrumentContext';
+import { InstrumentEmptyState } from '../components/layout/InstrumentEmptyState';
 import { GuitarProgressService } from '../services/guitarProgressService';
 import { GUITAR_MODULES } from '../data/guitarStructuredCurriculum';
 import { GuitarLesson } from '../types/guitarLessons';
@@ -39,6 +41,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const recommendedSkill = practiceSkills.find((s) => s.status === 'PRACTICING' || s.status === 'LEARNED') || practiceSkills.find((s) => s.status !== 'NOT_LEARNED');
   const completedCount = progressService.getCompletedLessonsCount();
   const practiceMinutesToday = progressService.getPracticeMinutesToday();
+
+  const { activeInstrument } = useInstrument();
+
+  if (activeInstrument !== 'guitar') {
+    return <InstrumentEmptyState />;
+  }
 
   // Find the next lesson dynamically from curriculum + progress state
   const allLessons = GUITAR_MODULES.flatMap((m) => m.lessons);

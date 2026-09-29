@@ -7,6 +7,8 @@ import React, { useState, useEffect } from 'react';
 import { GuitarProgressService } from '../../services/guitarProgressService';
 import { VibexAudioEngine } from '../../services/audioEngine';
 import { SpeechCoach } from '../../services/speechCoach';
+import { VibeAvatar } from './VibeAvatar';
+import { VibexLessonVideoPlayer } from './VibexLessonVideoPlayer';
 import {
   ArrowLeft,
   ArrowRight,
@@ -395,9 +397,26 @@ export const Lesson1_1Player: React.FC<Lesson1_1PlayerProps> = ({
               <h2 className="text-3xl sm:text-4xl font-black text-[#F6F4FF] tracking-tight">
                 Meet the Guitar
               </h2>
-              <p className="text-sm sm:text-base text-[#A9A8BA] max-w-lg mx-auto mt-2 leading-relaxed">
-                Before we pluck our first note or learn hand positions, let’s understand the instrument you’re about to master.
-              </p>
+            </div>
+
+            {/* Vibe Mentor Box - Intro */}
+            <div className="p-4 rounded-2xl bg-[#1D2032] border border-[#8067FF]/40 flex items-start gap-3.5 w-full max-w-2xl text-left shadow-lg">
+              <VibeAvatar expression="happy" size="sm" />
+              <div>
+                <span className="text-[11px] font-mono font-bold text-[#A99BFF] block uppercase tracking-wider">
+                  Vibe Coach
+                </span>
+                <p className="text-sm text-[#F6F4FF] mt-0.5 leading-relaxed">
+                  "Before we pluck our first note or learn hand positions, let’s watch a quick introduction to the instrument you’re about to master."
+                </p>
+              </div>
+            </div>
+
+            {/* Video Demonstration */}
+            <div className="w-full max-w-2xl mx-auto shadow-2xl shadow-[#8067FF]/10 rounded-2xl">
+              <VibexLessonVideoPlayer 
+                src="/assets/videos/guitar/lessons/lesson_1_1/lesson_1_1_intro.mp4" 
+              />
             </div>
 
             {/* Stylized Guitar Hero Silhouette */}
@@ -444,16 +463,14 @@ export const Lesson1_1Player: React.FC<Lesson1_1PlayerProps> = ({
               </div>
             </div>
 
-            {/* Vibe Mentor Box */}
-            <div className="p-4 rounded-2xl bg-[#1D2032] border border-[#8067FF]/40 flex items-start gap-3.5 max-w-lg text-left shadow-lg">
-              <div className="w-9 h-9 rounded-xl bg-[#8067FF] flex items-center justify-center font-black text-white shrink-0 text-sm">
-                V
-              </div>
+            {/* Vibe Mentor Box - Explains before interactive */}
+            <div className="p-4 rounded-2xl bg-[#1D2032] border border-[#8067FF]/40 flex items-start gap-3.5 w-full max-w-2xl text-left shadow-lg">
+              <VibeAvatar expression="talking" size="sm" />
               <div>
                 <span className="text-[11px] font-mono font-bold text-[#A99BFF] block uppercase tracking-wider">
                   Vibe Coach
                 </span>
-                <p className="text-xs text-[#F6F4FF] mt-0.5 leading-relaxed">
+                <p className="text-sm text-[#F6F4FF] mt-0.5 leading-relaxed">
                   "The guitar is one of the most expressive string instruments on earth. Let’s explore how its anatomy turns simple string vibrations into beautiful music."
                 </p>
               </div>

@@ -332,8 +332,8 @@ export const CURRICULA: Record<string, InstrumentCurriculum> = {
   // =========================================================================
   // B. KEYBOARD / PIANO
   // =========================================================================
-  piano: {
-    instrument: 'piano',
+  keyboard: {
+    instrument: 'keyboard',
     displayName: 'Keyboard & Grand Piano',
     tagline: 'Master ergonomic hand arch, finger independence, and polyphonic phrasing',
     accentColor: '#8067FF',
@@ -1476,7 +1476,7 @@ export const RECOMMENDED_SONGS = [
   {
     id: 'song-rec-1',
     title: 'Clair de Lune (Debussy Impressionism)',
-    instrument: 'piano' as const,
+    instrument: 'keyboard' as const,
     composer: 'Claude Debussy',
     difficulty: 'Intermediate',
     tempoBpm: 66,
@@ -2197,7 +2197,7 @@ export const GUITAR_PRACTICE_NODES: PracticeNode[] = [
 
 export const PRACTICE_NODES_MAP: Record<InstrumentType, PracticeNode[]> = {
   guitar: GUITAR_PRACTICE_NODES,
-  piano: [
+  keyboard: [
     {
       id: 'p-n-1.1',
       levelNumber: 1,

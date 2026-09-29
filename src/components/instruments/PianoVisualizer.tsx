@@ -50,7 +50,7 @@ export const PianoVisualizer: React.FC<PianoVisualizerProps> = ({
   const audioEngine = VibexAudioEngine.getInstance();
 
   const handleKeyPress = (name: string, freq: number) => {
-    audioEngine.playInstrumentNote('piano', freq, 900);
+    audioEngine.playInstrumentNote('keyboard', freq, 900);
     if (onKeyPlay) onKeyPlay(name, freq);
   };
 

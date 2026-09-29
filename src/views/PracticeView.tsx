@@ -5,6 +5,8 @@
 
 import React, { useState } from 'react';
 import { GuitarProgressService } from '../services/guitarProgressService';
+import { useInstrument } from '../contexts/InstrumentContext';
+import { InstrumentEmptyState } from '../components/layout/InstrumentEmptyState';
 import { PracticeSkillItem, PracticeExerciseItem } from '../types/guitarLessons';
 import { SpeedLabView } from '../components/practice/SpeedLabView';
 import { MetronomeTool } from '../components/practice/MetronomeTool';
@@ -52,6 +54,15 @@ export const PracticeView: React.FC<PracticeViewProps> = ({
 
   // Utility Drawer / Modal State (Tuner & Metronome)
   const [activeUtility, setActiveUtility] = useState<'none' | 'tuner' | 'metronome'>('none');
+
+  const { activeInstrument } = useInstrument();
+
+  if (activeInstrument !== 'guitar') {
+    return <InstrumentEmptyState 
+      title={`${activeInstrument} Practice`} 
+      message={`Practice tools and exercises for ${activeInstrument} are coming soon.`}
+    />;
+  }
 
   const progressService = GuitarProgressService.getInstance();
   const practiceSkills = progressService.getPracticeSkills();

@@ -41,7 +41,7 @@ interface DashboardViewProps {
 }
 
 const INSTRUMENT_IMAGES: Record<InstrumentType, string> = {
-  piano: '/src/assets/images/vibex_hero_piano_1790614064462.jpg',
+  keyboard: '/src/assets/images/vibex_hero_piano_1790614064462.jpg',
   guitar: '/src/assets/images/vibex_hero_guitar_1790614080065.jpg',
   violin: '/src/assets/images/vibex_hero_violin_1790614095969.jpg',
   bansuri: '/src/assets/images/vibex_hero_bansuri_1790614111939.jpg',
@@ -83,7 +83,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   };
 
   const instruments: { id: InstrumentType; name: string; accent: string; description: string }[] = [
-    { id: 'piano', name: 'Keyboard / Piano', accent: '#8067FF', description: 'Polyphonic hand arch & 5-finger independence' },
+    { id: 'keyboard', name: 'Keyboard / Piano', accent: '#8067FF', description: 'Polyphonic hand arch & 5-finger independence' },
     { id: 'guitar', name: 'Acoustic Guitar', accent: '#FF8066', description: 'Fret proximity & barre chord knuckle arch' },
     { id: 'violin', name: 'Classical Violin', accent: '#E889A5', description: 'Straight bow highway & micro-tonal intonation' },
     { id: 'bansuri', name: 'Bamboo Bansuri', accent: '#54D6C3', description: 'Embouchure lip seal & 6-hole pad coverage' },

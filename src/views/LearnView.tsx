@@ -7,9 +7,16 @@ import React, { useState } from 'react';
 import { GUITAR_MODULES } from '../data/guitarStructuredCurriculum';
 import { GuitarLesson, LessonStatus } from '../types/guitarLessons';
 import { GuitarProgressService } from '../services/guitarProgressService';
+import { useInstrument } from '../contexts/InstrumentContext';
+import { InstrumentEmptyState } from '../components/layout/InstrumentEmptyState';
 import { FullScreenLessonView } from '../components/lessons/FullScreenLessonView';
 import { GamifiedLearningMap } from '../components/lessons/GamifiedLearningMap';
 import { Lesson1_1Player } from '../components/lessons/Lesson1_1Player';
+import { LessonPlayerEngine, LessonPlayerConfig } from '../components/lessons/LessonPlayerEngine';
+import { LESSON_1_2_CONFIG } from '../data/lesson1_2Config';
+import { LESSON_1_3_CONFIG } from '../data/lesson1_3Config';
+import { LESSON_1_4_CONFIG } from '../data/lesson1_4Config';
+import { LESSON_1_6_CONFIG } from '../data/lesson1_6Config';
 import {
   BookOpen,
   CheckCircle2,
@@ -28,11 +35,26 @@ interface LearnViewProps {
   onNavigateToPractice?: (skillName?: string) => void;
 }
 
+// Map of lesson IDs to their interactive engine configs
+const INTERACTIVE_LESSON_CONFIGS: Record<string, LessonPlayerConfig> = {
+  lesson_1_2: LESSON_1_2_CONFIG,
+  lesson_1_3: LESSON_1_3_CONFIG,
+  lesson_1_4: LESSON_1_4_CONFIG,
+  lesson_1_6: LESSON_1_6_CONFIG,
+};
+
 export const LearnView: React.FC<LearnViewProps> = ({ onNavigateToPractice }) => {
   const [selectedLessonForPreview, setSelectedLessonForPreview] = useState<GuitarLesson | null>(null);
   const [activeFullScreenLesson, setActiveFullScreenLesson] = useState<GuitarLesson | null>(null);
   const [activeLesson1_1, setActiveLesson1_1] = useState<boolean>(false);
+  const [activeInteractiveConfig, setActiveInteractiveConfig] = useState<LessonPlayerConfig | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+
+  const { activeInstrument } = useInstrument();
+
+  if (activeInstrument !== 'guitar') {
+    return <InstrumentEmptyState />;
+  }
 
   const progressService = GuitarProgressService.getInstance();
 
@@ -56,6 +78,10 @@ export const LearnView: React.FC<LearnViewProps> = ({ onNavigateToPractice }) =>
   const handleSelectLesson = (lesson: GuitarLesson) => {
     if (lesson.id === 'lesson_1_1') {
       setActiveLesson1_1(true);
+    } else if (INTERACTIVE_LESSON_CONFIGS[lesson.id]) {
+      // Launch the interactive engine directly for lessons with configs
+      progressService.markLessonStarted(lesson.id);
+      setActiveInteractiveConfig(INTERACTIVE_LESSON_CONFIGS[lesson.id]);
     } else {
       setSelectedLessonForPreview(lesson);
     }
@@ -76,6 +102,19 @@ export const LearnView: React.FC<LearnViewProps> = ({ onNavigateToPractice }) =>
           onClose={() => setActiveLesson1_1(false)}
           onComplete={() => {
             setActiveLesson1_1(false);
+            setRefreshTrigger((prev) => prev + 1);
+          }}
+          onNavigateToPractice={onNavigateToPractice}
+        />
+      )}
+
+      {/* INTERACTIVE LESSON ENGINE (1.2, 1.3, 1.4, 1.6) */}
+      {activeInteractiveConfig && (
+        <LessonPlayerEngine
+          config={activeInteractiveConfig}
+          onClose={() => setActiveInteractiveConfig(null)}
+          onComplete={() => {
+            setActiveInteractiveConfig(null);
             setRefreshTrigger((prev) => prev + 1);
           }}
           onNavigateToPractice={onNavigateToPractice}
