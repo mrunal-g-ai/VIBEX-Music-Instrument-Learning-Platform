@@ -26,7 +26,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ streakCount }) => {
   const teacherEngine = VibeTeacherEngine.getInstance();
   const skillAssessments = teacherEngine.getSkillAssessmentDetails();
   const progressService = GuitarProgressService.getInstance();
-  const completedSkills = progressService.getCompletedSkills();
+  const practiceSkills = progressService.getPracticeSkills();
+  const learnedSkillsCount = practiceSkills.filter((s) => s.status !== 'NOT_LEARNED').length;
   const completedLessonsCount = progressService.getCompletedLessonsCount();
   const practiceSessions = progressService.getPracticeSessions();
   const practiceMinutesToday = progressService.getPracticeMinutesToday();
@@ -86,7 +87,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ streakCount }) => {
           <div className="p-3 bg-[#0D0E17] rounded-xl border border-[#303348] text-center min-w-[80px]">
             <span className="text-[10px] text-[#A9A8BA] block uppercase font-mono">Skills</span>
             <span className="text-sm font-bold font-mono text-[#45D483]">
-              {completedSkills.length}
+              {learnedSkillsCount}
             </span>
           </div>
         </div>

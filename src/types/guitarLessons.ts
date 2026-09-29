@@ -135,6 +135,44 @@ export interface PracticeSessionRecord {
   timestamp: string;
 }
 
+export type PracticeSkillStatus = 'NOT_LEARNED' | 'LEARNED' | 'PRACTICING' | 'IMPROVING' | 'MASTERED';
+
+export type PracticeVisualMode =
+  | 'FRETBOARD'
+  | 'CHORD_DIAGRAM'
+  | 'RHYTHM_GRID'
+  | 'TUNER'
+  | 'AUDIO'
+  | 'TEXT'
+  | 'TECHNIQUE';
+
+export interface PracticeSkillItem {
+  id: string;
+  skillName: string;
+  category: 'Technique' | 'Chords' | 'Rhythm' | 'Chord Changes' | 'Songs';
+  description: string;
+  status: PracticeSkillStatus;
+  prerequisiteLessonId: string;
+  learnedDate?: string;
+  lastPracticedDate?: string;
+  practiceCount: number;
+  bestBpm?: number;
+  isSpeedBased: boolean;
+}
+
+export interface PracticeExerciseItem {
+  id: string;
+  title: string;
+  category: 'Technique' | 'Chords' | 'Rhythm' | 'Chord Changes' | 'Songs';
+  why: string;
+  what: string;
+  how: string;
+  visualMode: PracticeVisualMode;
+  targetTempo?: number;
+  durationMinutes: number;
+  skillId?: string;
+}
+
 export interface AchievementItem {
   id: string;
   title: string;

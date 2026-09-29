@@ -35,7 +35,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
   streakCount,
 }) => {
   const progressService = GuitarProgressService.getInstance();
-  const completedSkills = progressService.getCompletedSkills();
+  const practiceSkills = progressService.getPracticeSkills();
+  const recommendedSkill = practiceSkills.find((s) => s.status === 'PRACTICING' || s.status === 'LEARNED') || practiceSkills.find((s) => s.status !== 'NOT_LEARNED');
   const completedCount = progressService.getCompletedLessonsCount();
   const practiceMinutesToday = progressService.getPracticeMinutesToday();
 
@@ -135,32 +136,30 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
         </div>
 
-        {/* After This / Practice Studio */}
+        {/* Today's Practice Recommendation (Section 38) */}
         <div className="p-6 rounded-3xl bg-[#151725] border border-[#FF8066]/40 flex flex-col justify-between gap-6 shadow-xl relative overflow-hidden group hover:border-[#FF8066] transition-colors">
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <span className="px-3 py-1 rounded-full bg-[#FF8066]/20 text-[#FF8066] text-xs font-mono font-bold flex items-center gap-1.5">
                 <Zap className="w-3.5 h-3.5" />
-                <span>AFTER THIS · PRACTICE</span>
+                <span>TODAY'S PRACTICE</span>
               </span>
               <span className="text-xs font-mono text-[#54D6C3] font-bold">
-                {completedSkills.length > 0 ? `${completedSkills.length} Skills Ready` : 'Studio Ready'}
+                15 Minutes
               </span>
             </div>
 
             <div>
               <span className="text-xs text-[#A9A8BA]">
-                {completedSkills.length > 0 ? 'Targeted Practice' : 'Foundational Studio Drills'}
+                {recommendedSkill ? 'Targeted Technique & Repetition' : 'Foundational Practice Routine'}
               </span>
               <h2 className="text-xl font-bold text-[#F6F4FF] mt-1">
-                {completedSkills.length > 0
-                  ? `Practice ${completedSkills[0].skillName}`
-                  : 'Spider Walk & Speed Lab'}
+                {recommendedSkill ? `Recommended: ${recommendedSkill.skillName}` : 'Recommended: Spider Walk & Tuning'}
               </h2>
               <p className="text-xs text-[#A9A8BA] mt-2 leading-relaxed">
-                {completedSkills.length > 0
-                  ? `Reinforce clean intonation and build transitions with a focused 5-minute repetition session.`
-                  : 'Develop finger independence with the 1-2-3-4 spider walk and tune your guitar in the studio.'}
+                {recommendedSkill
+                  ? `Build muscle memory, individual string clarity, and transition speed with a structured 15-minute workout.`
+                  : 'Develop finger independence with the 1-2-3-4 spider walk and calibrate your guitar in the studio.'}
               </p>
             </div>
           </div>
@@ -169,8 +168,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
             onClick={onNavigateToPractice}
             className="w-full py-3.5 rounded-xl bg-[#FF8066] hover:bg-[#ff6e50] text-[#0D0E17] font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-[#FF8066]/25 transition-all hover:scale-[1.01]"
           >
-            <span>Open Practice Studio</span>
-            <ArrowRight className="w-4 h-4" />
+            <Play className="w-4 h-4 fill-current" />
+            <span>Start Practice (15m)</span>
           </button>
         </div>
       </div>

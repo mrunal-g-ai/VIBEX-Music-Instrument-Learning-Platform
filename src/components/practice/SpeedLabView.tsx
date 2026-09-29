@@ -198,7 +198,7 @@ export const SpeedLabView: React.FC<SpeedLabViewProps> = ({ onBack }) => {
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <button
                 onClick={toggleMetronome}
                 className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all ${
@@ -211,9 +211,10 @@ export const SpeedLabView: React.FC<SpeedLabViewProps> = ({ onBack }) => {
 
               <button
                 onClick={() => setRepsCount((p) => p + 1)}
-                className="px-3.5 py-2 rounded-xl bg-[#1D2032] border border-[#303348] text-xs font-semibold hover:border-[#8067FF]"
+                className="px-3.5 py-2 rounded-xl bg-[#1D2032] border border-[#303348] text-xs font-semibold hover:border-[#54D6C3] text-[#F6F4FF]"
+                title="Tap after completing one clean round through all strings"
               >
-                + Rep ({repsCount})
+                + Clean Round ({repsCount} manual)
               </button>
             </div>
           </div>

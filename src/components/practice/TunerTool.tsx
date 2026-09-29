@@ -5,24 +5,29 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { VibexAudioEngine } from '../../services/audioEngine';
-import { Mic, MicOff, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Mic, MicOff, AlertCircle, CheckCircle2, X, ChevronRight } from 'lucide-react';
 
-const GUITAR_STRINGS = [
-  { name: 'E2', num: 6, freq: 82.41 },
-  { name: 'A2', num: 5, freq: 110.0 },
-  { name: 'D3', num: 4, freq: 146.83 },
-  { name: 'G3', num: 3, freq: 196.0 },
-  { name: 'B3', num: 2, freq: 246.94 },
-  { name: 'E4', num: 1, freq: 329.63 },
+export const GUITAR_STRINGS = [
+  { name: 'E2', num: 6, label: 'Low E', freq: 82.41 },
+  { name: 'A2', num: 5, label: 'A', freq: 110.0 },
+  { name: 'D3', num: 4, label: 'D', freq: 146.83 },
+  { name: 'G3', num: 3, label: 'G', freq: 196.0 },
+  { name: 'B3', num: 2, label: 'B', freq: 246.94 },
+  { name: 'E4', num: 1, label: 'High E', freq: 329.63 },
 ];
 
-export const TunerTool: React.FC = () => {
+interface TunerToolProps {
+  onClose?: () => void;
+}
+
+export const TunerTool: React.FC<TunerToolProps> = ({ onClose }) => {
   const [isListening, setIsListening] = useState<boolean>(false);
   const [micError, setMicError] = useState<string | null>(null);
   const [detectedNote, setDetectedNote] = useState<string>('--');
   const [detectedFreq, setDetectedFreq] = useState<number | null>(null);
   const [centsDeviation, setCentsDeviation] = useState<number>(0);
-  const [closestString, setClosestString] = useState<typeof GUITAR_STRINGS[0] | null>(null);
+  const [closestString, setClosestString] = useState<typeof GUITAR_STRINGS[0]>(GUITAR_STRINGS[0]);
+  const [targetStringNum, setTargetStringNum] = useState<number>(6);
 
   const audioEngine = VibexAudioEngine.getInstance();
   const animFrameRef = useRef<number | null>(null);
@@ -32,7 +37,7 @@ export const TunerTool: React.FC = () => {
     setMicError(null);
     const success = await audioEngine.startPitchTracking();
     if (!success) {
-      setMicError('Microphone permission denied or not available. Please grant mic access in your browser to tune your guitar.');
+      setMicError('Microphone permission denied. Please allow microphone access in your browser to tune your guitar.');
       setIsListening(false);
       return;
     }
@@ -87,29 +92,43 @@ export const TunerTool: React.FC = () => {
     };
   }, [isListening]);
 
-  const isInTune = Math.abs(centsDeviation) <= 5 && detectedNote !== '--';
+  const isInTune = Math.abs(centsDeviation) <= 3 && detectedNote !== '--';
+  const isTooLow = centsDeviation < -3 && detectedNote !== '--';
+  const isTooHigh = centsDeviation > 3 && detectedNote !== '--';
 
   return (
-    <div className="w-full bg-[#151725] border border-[#303348] rounded-2xl p-6 flex flex-col gap-6 shadow-xl">
+    <div className="w-full bg-[#151725] border border-[#303348] rounded-2xl p-6 flex flex-col gap-6 shadow-2xl animate-in fade-in duration-200">
+      {/* Header */}
       <div className="flex items-center justify-between border-b border-[#303348] pb-4">
         <div>
-          <h3 className="text-base font-bold text-[#F6F4FF]">Standard Guitar Tuner (E A D G B E)</h3>
-          <p className="text-xs text-[#A9A8BA]">
-            Real-time fundamental frequency pitch tracking with sub-cent accuracy
-          </p>
+          <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-[#54D6C3]/20 text-[#54D6C3] font-bold">
+            Interactive Guitar Tuner
+          </span>
+          <h3 className="text-base font-bold text-[#F6F4FF] mt-1">Standard Tuning (E A D G B E)</h3>
         </div>
 
-        <button
-          onClick={isListening ? stopTuner : startTuner}
-          className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
-            isListening
-              ? 'bg-[#F06B78] text-white'
-              : 'bg-[#54D6C3] text-[#0D0E17] hover:bg-[#45c2b0]'
-          }`}
-        >
-          {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-          <span>{isListening ? 'Stop Tuner' : 'Enable Microphone'}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={isListening ? stopTuner : startTuner}
+            className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+              isListening
+                ? 'bg-[#F06B78] text-white'
+                : 'bg-[#54D6C3] text-[#0D0E17] hover:bg-[#45c2b0]'
+            }`}
+          >
+            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            <span>{isListening ? 'Stop Mic' : 'Enable Microphone'}</span>
+          </button>
+
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="p-2 rounded-xl bg-[#1D2032] border border-[#303348] text-[#A9A8BA] hover:text-[#F6F4FF]"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {micError && (
@@ -119,14 +138,44 @@ export const TunerTool: React.FC = () => {
         </div>
       )}
 
-      {/* Main Pitch Dial */}
+      {/* Beginner Step Guidance Callout */}
+      <div className="p-3.5 rounded-xl bg-[#0D0E17] border border-[#303348] flex items-center justify-between text-xs">
+        <span className="font-semibold text-[#F6F4FF]">
+          Target: String {targetStringNum} ({GUITAR_STRINGS.find((s) => s.num === targetStringNum)?.label})
+        </span>
+        <span className="text-[#A9A8BA]">
+          Pluck string cleanly and watch the needle below
+        </span>
+      </div>
+
+      {/* Main Pitch & Guidance Dial */}
       <div className="flex flex-col items-center justify-center p-6 rounded-2xl bg-[#0D0E17] border border-[#303348] gap-4">
+        {/* Tuning Instruction Banner (Section 24 & 26) */}
+        <div className="text-center min-h-[48px] flex flex-col items-center justify-center">
+          {!isListening ? (
+            <span className="text-xs text-[#A9A8BA]">Click 'Enable Microphone' above to begin tuning</span>
+          ) : detectedNote === '--' ? (
+            <span className="text-xs text-[#A9A8BA] animate-pulse">Pluck any open string...</span>
+          ) : isInTune ? (
+            <span className="text-xs font-bold text-[#45D483] flex items-center gap-1.5 animate-in zoom-in-95">
+              <CheckCircle2 className="w-4 h-4" />
+              <span>✓ IN TUNE — Pure Resonance!</span>
+            </span>
+          ) : isTooLow ? (
+            <span className="text-xs font-bold text-[#F4BB55]">
+              TOO LOW — Turn tuning peg slightly higher (Tighten →)
+            </span>
+          ) : (
+            <span className="text-xs font-bold text-[#FF8066]">
+              TOO HIGH — Loosen tuning peg slightly (← Loosen)
+            </span>
+          )}
+        </div>
+
+        {/* Big Note & Frequency Display */}
         <div className="text-center">
-          <span className="text-xs text-[#A9A8BA] font-mono block mb-1 uppercase tracking-wider">
-            Detected Pitch
-          </span>
           <span
-            className={`text-6xl font-extrabold font-mono transition-colors ${
+            className={`text-6xl sm:text-7xl font-black font-mono transition-colors ${
               isInTune ? 'text-[#45D483]' : 'text-[#F6F4FF]'
             }`}
           >
@@ -137,17 +186,28 @@ export const TunerTool: React.FC = () => {
           </span>
         </div>
 
-        {/* Cents Needle Display (-50 to +50 cents) */}
-        <div className="w-full max-w-md flex flex-col gap-2">
-          <div className="relative w-full h-4 bg-[#1D2032] rounded-full overflow-hidden border border-[#303348]">
-            {/* Center zero line */}
+        {/* Central Tuner Needle Display (Section 25) */}
+        <div className="w-full max-w-md flex flex-col gap-2 mt-2">
+          <div className="flex items-center justify-between text-[11px] font-mono text-[#A9A8BA]">
+            <span className="text-[#F4BB55]">← Loosen (Flat)</span>
+            <span className="text-[#45D483] font-bold">IN TUNE (0)</span>
+            <span className="text-[#FF8066]">Tighten → (Sharp)</span>
+          </div>
+
+          <div className="relative w-full h-5 bg-[#1D2032] rounded-full overflow-hidden border border-[#303348]">
+            {/* Center zero in-tune target zone */}
+            <div className="absolute top-0 bottom-0 left-[48%] right-[48%] bg-[#45D483]/30 z-0" />
             <div className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-[#45D483] z-10" />
 
             {/* Needle indicator */}
             {isListening && detectedFreq && (
               <div
-                className={`absolute top-0 bottom-0 w-3 rounded-full transition-all duration-75 transform -translate-x-1/2 ${
-                  isInTune ? 'bg-[#45D483] shadow-[0_0_8px_#45D483]' : 'bg-[#FF8066]'
+                className={`absolute top-0 bottom-0 w-3 rounded-full transition-all duration-75 transform -translate-x-1/2 z-20 ${
+                  isInTune
+                    ? 'bg-[#45D483] shadow-[0_0_12px_#45D483]'
+                    : isTooLow
+                    ? 'bg-[#F4BB55]'
+                    : 'bg-[#FF8066]'
                 }`}
                 style={{
                   left: `${Math.min(100, Math.max(0, 50 + centsDeviation))}%`,
@@ -157,32 +217,36 @@ export const TunerTool: React.FC = () => {
           </div>
 
           <div className="flex items-center justify-between text-[10px] font-mono text-[#A9A8BA]">
-            <span>-50 cents (Flat)</span>
+            <span>-50 cents</span>
             <span className={isInTune ? 'text-[#45D483] font-bold' : ''}>
-              {detectedNote !== '--' ? `${centsDeviation > 0 ? '+' : ''}${centsDeviation} cents` : 'In Tune (0)'}
+              {detectedNote !== '--' ? `${centsDeviation > 0 ? '+' : ''}${centsDeviation} cents` : '0 cents'}
             </span>
-            <span>+50 cents (Sharp)</span>
+            <span>+50 cents</span>
           </div>
         </div>
       </div>
 
-      {/* Standard 6 Strings Reference Bar */}
+      {/* 6 Guitar Strings Reference Grid (Section 25) */}
       <div className="grid grid-cols-6 gap-2 text-center text-xs font-mono">
         {GUITAR_STRINGS.map((s) => {
-          const isTargeted = closestString?.num === s.num;
+          const isTargeted = targetStringNum === s.num;
+          const isDetected = closestString?.num === s.num && detectedNote !== '--';
           return (
-            <div
+            <button
               key={s.num}
-              className={`p-2.5 rounded-xl border transition-all ${
+              onClick={() => setTargetStringNum(s.num)}
+              className={`p-3 rounded-xl border transition-all ${
                 isTargeted
                   ? 'bg-[#FF8066]/20 border-[#FF8066] text-[#FF8066] font-bold shadow-md'
-                  : 'bg-[#0D0E17] border-[#303348] text-[#A9A8BA]'
+                  : isDetected
+                  ? 'bg-[#1D2032] border-[#54D6C3] text-[#54D6C3]'
+                  : 'bg-[#0D0E17] border-[#303348] text-[#A9A8BA] hover:text-[#F6F4FF]'
               }`}
             >
-              <span className="block text-[10px] text-[#A9A8BA]">String {s.num}</span>
+              <span className="block text-[10px] text-[#A9A8BA]">Str {s.num}</span>
               <span className="text-sm font-bold text-[#F6F4FF]">{s.name}</span>
-              <span className="block text-[10px] text-[#A9A8BA]">{s.freq} Hz</span>
-            </div>
+              <span className="block text-[9px] text-[#A9A8BA]">{s.freq} Hz</span>
+            </button>
           );
         })}
       </div>
