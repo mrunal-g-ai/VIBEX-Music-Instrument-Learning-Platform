@@ -7,20 +7,20 @@
 // 14-DIMENSION VIBEX SKILL PROFILE
 // =========================================================================
 export interface GuitarSkillProfile {
-  technique: number;     // 1 to 10
-  rhythm: number;        // 1 to 10
-  chords: number;        // 1 to 10
-  chordChanges: number;  // 1 to 10
-  scales: number;        // 1 to 10
-  lead: number;          // 1 to 10
-  fingerstyle: number;   // 1 to 10
-  theory: number;        // 1 to 10
-  earTraining: number;   // 1 to 10
-  fretboard: number;     // 1 to 10
-  repertoire: number;    // 1 to 10
-  improvisation: number; // 1 to 10
-  composition: number;   // 1 to 10
-  performance: number;   // 1 to 10
+  technique: number | null;     // 1 to 10 or null if unassessed
+  rhythm: number | null;        // 1 to 10 or null if unassessed
+  chords: number | null;        // 1 to 10 or null if unassessed
+  chordChanges: number | null;  // 1 to 10 or null if unassessed
+  scales: number | null;        // 1 to 10 or null if unassessed
+  lead: number | null;          // 1 to 10 or null if unassessed
+  fingerstyle: number | null;   // 1 to 10 or null if unassessed
+  theory: number | null;        // 1 to 10 or null if unassessed
+  earTraining: number | null;   // 1 to 10 or null if unassessed
+  fretboard: number | null;     // 1 to 10 or null if unassessed
+  repertoire: number | null;    // 1 to 10 or null if unassessed
+  improvisation: number | null; // 1 to 10 or null if unassessed
+  composition: number | null;   // 1 to 10 or null if unassessed
+  performance: number | null;   // 1 to 10 or null if unassessed
 }
 
 export type SkillCategory = keyof GuitarSkillProfile;
@@ -31,6 +31,16 @@ export interface SkillCategoryInfo {
   color: string;
   description: string;
 }
+
+export interface SkillAssessmentDetail {
+  key: SkillCategory;
+  label: string;
+  color: string;
+  isAssessed: boolean;
+  score: number | null;
+  evidenceText: string;
+}
+
 
 // =========================================================================
 // THE 7 PEDAGOGICAL PILLARS

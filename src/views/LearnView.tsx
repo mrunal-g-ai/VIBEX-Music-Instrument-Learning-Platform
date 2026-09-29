@@ -22,7 +22,11 @@ import {
   AlertCircle,
 } from 'lucide-react';
 
-export const LearnView: React.FC = () => {
+interface LearnViewProps {
+  onNavigateToPractice?: (skillName?: string) => void;
+}
+
+export const LearnView: React.FC<LearnViewProps> = ({ onNavigateToPractice }) => {
   const [selectedLessonForPreview, setSelectedLessonForPreview] = useState<GuitarLesson | null>(null);
   const [activeFullScreenLesson, setActiveFullScreenLesson] = useState<GuitarLesson | null>(null);
   const [activeCategoryFilter, setActiveCategoryFilter] = useState<string>('all');
@@ -61,14 +65,8 @@ export const LearnView: React.FC = () => {
             Guitar Learning Path
           </h1>
           <p className="text-xs text-[#A9A8BA] mt-0.5">
-            Teacher-led guitar curriculum from Absolute Beginner to Professional Musician. All lessons open for inspection.
+            Teacher-led structured guitar curriculum from Absolute Beginner to Mastery.
           </p>
-        </div>
-
-        {/* Development Mode Notice */}
-        <div className="px-3.5 py-1.5 rounded-xl bg-[#151725] border border-[#303348] text-xs text-[#A9A8BA] flex items-center gap-2 self-start sm:self-auto font-mono">
-          <span className="w-2 h-2 rounded-full bg-[#54D6C3]" />
-          <span>Dev Mode: All Lessons Openable</span>
         </div>
       </div>
 
@@ -92,6 +90,11 @@ export const LearnView: React.FC = () => {
               {module.lessons.map((lesson) => {
                 const status = getLessonStatus(lesson.id);
                 const badge = getStatusBadge(status);
+
+                let actionLabel = 'Start Lesson';
+                if (status === 'in_progress') actionLabel = 'Continue Lesson';
+                else if (status === 'completed') actionLabel = 'Review Lesson';
+                else if (status === 'mastered') actionLabel = 'Practice Skill';
 
                 return (
                   <div
@@ -127,7 +130,7 @@ export const LearnView: React.FC = () => {
                       </span>
 
                       <span className="font-semibold text-[#8067FF] group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                        <span>Inspect</span>
+                        <span>{actionLabel}</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </span>
                     </div>
@@ -219,13 +222,23 @@ export const LearnView: React.FC = () => {
                 onClick={() => {
                   const target = selectedLessonForPreview;
                   setSelectedLessonForPreview(null);
-                  setActiveFullScreenLesson(target);
+                  if (target) {
+                    progressService.markLessonStarted(target.id);
+                    setActiveFullScreenLesson(target);
+                  }
                 }}
                 className="px-6 py-3 rounded-xl bg-[#8067FF] hover:bg-[#6952E6] text-white font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-[#8067FF]/25 transition-all hover:scale-[1.02]"
               >
                 <Play className="w-4 h-4 fill-current" />
-                <span>Start Full-Screen Lesson</span>
+                <span>
+                  {selectedLessonForPreview && getLessonStatus(selectedLessonForPreview.id) === 'in_progress'
+                    ? 'Continue Lesson'
+                    : selectedLessonForPreview && getLessonStatus(selectedLessonForPreview.id) === 'completed'
+                    ? 'Review Lesson'
+                    : 'Start Lesson'}
+                </span>
               </button>
+
             </div>
           </div>
         </div>
@@ -237,6 +250,13 @@ export const LearnView: React.FC = () => {
           lesson={activeFullScreenLesson}
           onClose={() => setActiveFullScreenLesson(null)}
           onLessonCompleted={(lessonId) => {
+            setActiveFullScreenLesson(null);
+          }}
+          onNavigateToPractice={(skill) => {
+            setActiveFullScreenLesson(null);
+            if (onNavigateToPractice) onNavigateToPractice(skill);
+          }}
+          onNavigateToLearn={() => {
             setActiveFullScreenLesson(null);
           }}
         />

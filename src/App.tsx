@@ -41,7 +41,9 @@ export default function App() {
             />
           )}
 
-          {currentTab === 'learn' && <LearnView />}
+          {currentTab === 'learn' && (
+            <LearnView onNavigateToPractice={() => setCurrentTab('practice')} />
+          )}
 
           {currentTab === 'practice' && (
             <PracticeView
@@ -63,6 +65,14 @@ export default function App() {
           onClose={() => setActiveFullScreenLesson(null)}
           onLessonCompleted={(lessonId) => {
             setActiveFullScreenLesson(null);
+          }}
+          onNavigateToPractice={(skill) => {
+            setActiveFullScreenLesson(null);
+            setCurrentTab('practice');
+          }}
+          onNavigateToLearn={() => {
+            setActiveFullScreenLesson(null);
+            setCurrentTab('learn');
           }}
         />
       )}

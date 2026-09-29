@@ -38,6 +38,8 @@ export const MasterGuitarFretboard: React.FC<MasterGuitarFretboardProps> = ({
 }) => {
   const [pluckedStringIndex, setPluckedStringIndex] = useState<number | null>(null);
   const [testedStrings, setTestedStrings] = useState<Set<number>>(new Set());
+  const [isStrummingAnim, setIsStrummingAnim] = useState<boolean>(false);
+  const [strumPickY, setStrumPickY] = useState<number>(0);
   const audioEngine = VibexAudioEngine.getInstance();
 
   const handlePluck = (stringIndex: number, fret: number) => {
@@ -60,6 +62,7 @@ export const MasterGuitarFretboard: React.FC<MasterGuitarFretboardProps> = ({
   };
 
   const strumAllStrings = () => {
+    setIsStrummingAnim(true);
     STRINGS_INFO.forEach((str, idx) => {
       let targetFret = 0;
       if (chordVoicing) {
@@ -68,13 +71,18 @@ export const MasterGuitarFretboard: React.FC<MasterGuitarFretboardProps> = ({
         targetFret = typeof val === 'number' ? val : 0;
       }
       setTimeout(() => {
+        setStrumPickY(idx * 30 + 10);
         handlePluck(idx, targetFret);
       }, idx * 70);
     });
+
+    setTimeout(() => {
+      setIsStrummingAnim(false);
+    }, STRINGS_INFO.length * 70 + 300);
   };
 
   return (
-    <div className="w-full bg-[#151725] rounded-2xl border border-[#303348] p-4 sm:p-5 flex flex-col gap-4 shadow-xl">
+    <div className="w-full bg-[#151725] rounded-2xl border border-[#303348] p-4 sm:p-5 flex flex-col gap-4 shadow-xl relative">
       {/* Header Controls */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#303348] pb-3">
         <div className="flex items-center gap-2.5">
@@ -90,12 +98,18 @@ export const MasterGuitarFretboard: React.FC<MasterGuitarFretboardProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
+          {isStrummingAnim && (
+            <span className="text-[11px] font-mono text-[#54D6C3] font-bold flex items-center gap-1 animate-pulse">
+              <span>↓ Downstroke</span>
+            </span>
+          )}
           <button
             onClick={strumAllStrings}
-            className="px-3.5 py-1.5 rounded-lg bg-[#FF8066] hover:bg-[#ff6c4e] text-[#0D0E17] font-bold text-xs transition-colors flex items-center gap-1.5 shadow-md"
+            disabled={isStrummingAnim}
+            className="px-3.5 py-1.5 rounded-lg bg-[#FF8066] hover:bg-[#ff6c4e] disabled:opacity-50 text-[#0D0E17] font-bold text-xs transition-colors flex items-center gap-1.5 shadow-md"
           >
             <Volume2 className="w-3.5 h-3.5" />
-            <span>Strum Chord</span>
+            <span>{isStrummingAnim ? 'Strumming...' : 'Strum Chord'}</span>
           </button>
         </div>
       </div>
@@ -144,6 +158,19 @@ export const MasterGuitarFretboard: React.FC<MasterGuitarFretboardProps> = ({
               </div>
             ))}
           </div>
+
+          {/* Animated Strum Pick Indicator */}
+          {isStrummingAnim && (
+            <div
+              className="absolute left-10 z-30 pointer-events-none transition-all duration-75 flex items-center gap-1.5"
+              style={{ top: `${strumPickY}px` }}
+            >
+              <div className="w-3.5 h-3.5 rotate-45 bg-[#FF8066] border border-[#FAF6EE] rounded-sm shadow-[0_0_12px_#FF8066]" />
+              <span className="text-[9px] font-mono font-bold text-[#FF8066] bg-[#0D0E17]/90 px-1.5 py-0.5 rounded border border-[#FF8066]/40 shadow-sm">
+                Pick
+              </span>
+            </div>
+          )}
 
           {/* 6 Guitar Strings (Horizontal) */}
           {STRINGS_INFO.map((str, stringIdx) => {

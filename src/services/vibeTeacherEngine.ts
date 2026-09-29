@@ -29,21 +29,23 @@ export const SKILL_CATEGORIES_METADATA: SkillCategoryInfo[] = [
   { key: 'performance', label: 'Performance', color: '#FB7185', description: 'Stage poise, recording takes, tone shaping, click tracking' },
 ];
 
+import { GuitarProgressService } from './guitarProgressService';
+
 const DEFAULT_PROFILE: GuitarSkillProfile = {
-  technique: 6,
-  rhythm: 7,
-  chords: 6,
-  chordChanges: 5,
-  scales: 4,
-  lead: 4,
-  fingerstyle: 3,
-  theory: 5,
-  earTraining: 3,
-  fretboard: 4,
-  repertoire: 6,
-  improvisation: 3,
-  composition: 2,
-  performance: 4,
+  technique: null,
+  rhythm: null,
+  chords: null,
+  chordChanges: null,
+  scales: null,
+  lead: null,
+  fingerstyle: null,
+  theory: null,
+  earTraining: null,
+  fretboard: null,
+  repertoire: null,
+  improvisation: null,
+  composition: null,
+  performance: null,
 };
 
 const STORAGE_KEY_PROFILE = 'vibex_guitar_skill_profile';
@@ -67,7 +69,7 @@ export class VibeTeacherEngine {
   }
 
   // =========================================================================
-  // SKILL PROFILE MANAGEMENT
+  // SKILL PROFILE MANAGEMENT (REAL EVIDENCE BASED)
   // =========================================================================
   private loadProfile(): GuitarSkillProfile {
     if (typeof window === 'undefined') return DEFAULT_PROFILE;
@@ -84,8 +86,75 @@ export class VibeTeacherEngine {
     return { ...this.skillProfile };
   }
 
+  /**
+   * Returns honest, evidence-backed skill assessments.
+   * If user has no sessions or completed lessons in a category, returns 'Not assessed yet'.
+   */
+  public getSkillAssessmentDetails() {
+    const progressService = GuitarProgressService.getInstance();
+    const completedSkills = progressService.getCompletedSkills();
+    const sessions = progressService.getPracticeSessions();
+    const speedHistory = progressService.getSpeedLabHistory();
+
+    const chordSkills = completedSkills.filter((s) => s.category === 'Chords');
+    const techniqueSessions = sessions.filter((s) => s.category === 'Technique' || s.exerciseName.includes('Spider'));
+    const rhythmSessions = sessions.filter((s) => s.category === 'Rhythm' || s.exerciseName.includes('Strum'));
+    const speedSessions = speedHistory.length;
+
+    return SKILL_CATEGORIES_METADATA.map((cat) => {
+      let isAssessed = false;
+      let score: number | null = null;
+      let evidenceText = 'Not assessed yet';
+
+      if (cat.key === 'chords') {
+        if (chordSkills.length > 0) {
+          isAssessed = true;
+          const avgAcc = chordSkills.reduce((acc, s) => acc + s.accuracy, 0) / chordSkills.length;
+          score = Math.round((avgAcc / 10) * 10) / 10;
+          evidenceText = `${chordSkills.length} chord${chordSkills.length > 1 ? 's' : ''} learned · ${chordSkills.reduce((acc, s) => acc + s.practiceCount, 0)} practices`;
+        }
+      } else if (cat.key === 'technique') {
+        if (techniqueSessions.length > 0) {
+          isAssessed = true;
+          score = Math.min(10, Math.round(5.0 + techniqueSessions.length * 0.4));
+          evidenceText = `Based on ${techniqueSessions.length} dexterity drill${techniqueSessions.length > 1 ? 's' : ''}`;
+        }
+      } else if (cat.key === 'chordChanges') {
+        if (speedSessions > 0) {
+          isAssessed = true;
+          const best = Math.max(...speedHistory.map((s) => s.cleanRepetitions));
+          score = Math.min(10, Math.round((best / 25) * 10));
+          evidenceText = `Best: ${best} switches/30s · ${speedSessions} tests`;
+        }
+      } else if (cat.key === 'rhythm') {
+        if (rhythmSessions.length > 0) {
+          isAssessed = true;
+          score = Math.min(10, Math.round(5.0 + rhythmSessions.length * 0.5));
+          evidenceText = `Based on ${rhythmSessions.length} metronome sessions`;
+        }
+      } else if (cat.key === 'repertoire') {
+        const songSessions = sessions.filter((s) => s.category === 'Songs');
+        if (songSessions.length > 0) {
+          isAssessed = true;
+          score = Math.min(10, Math.round(4.0 + songSessions.length * 0.5));
+          evidenceText = `${songSessions.length} song practice take${songSessions.length > 1 ? 's' : ''}`;
+        }
+      }
+
+      return {
+        key: cat.key,
+        label: cat.label,
+        color: cat.color,
+        description: cat.description,
+        isAssessed,
+        score,
+        evidenceText,
+      };
+    });
+  }
+
   public updateSkillScore(skill: SkillCategory, delta: number): void {
-    const current = this.skillProfile[skill];
+    const current = this.skillProfile[skill] || 5;
     const updated = Math.min(10, Math.max(1, current + delta));
     this.skillProfile[skill] = updated;
     this.persistProfile();
@@ -99,6 +168,7 @@ export class VibeTeacherEngine {
       // ignore
     }
   }
+
 
   // =========================================================================
   // MASTERY RECORDS
@@ -182,17 +252,21 @@ export class VibeTeacherEngine {
   } {
     const profile = this.skillProfile;
     const sorted = [...SKILL_CATEGORIES_METADATA].sort(
-      (a, b) => profile[a.key] - profile[b.key]
+      (a, b) => (profile[a.key] ?? 0) - (profile[b.key] ?? 0)
     );
 
     const weaknesses = sorted.slice(0, 3);
     const strengths = sorted.slice(-3).reverse();
 
-    let vibeRecommendation = `Your ${strengths[0].label} (${profile[strengths[0].key]}/10) is showing remarkable confidence! `;
-    if (profile[weaknesses[0].key] <= 4) {
-      vibeRecommendation += `However, your ${weaknesses[0].label} (${profile[weaknesses[0].key]}/10) needs reinforcement before we leap ahead. Today Vibe prepared a balanced 15-minute workout to synchronize your fretboard with your ear!`;
+    const hasAnyAssessment = Object.values(profile).some((v) => v !== null);
+
+    let vibeRecommendation: string;
+    if (!hasAnyAssessment) {
+      vibeRecommendation =
+        'Welcome to VIBEX Guitar Studio! Start with foundational guitar posture, string names, and your first complete chord (C Major) to establish your personal skill baseline.';
     } else {
-      vibeRecommendation += `All fundamental pillars are stabilizing nicely. Let's tackle a new milestone chord change and syncopated rhythm!`;
+      const bestScore = profile[strengths[0].key];
+      vibeRecommendation = `Your ${strengths[0].label}${bestScore !== null ? ` (${bestScore}/10)` : ''} is developing with practice. Let's continue reinforcing fundamental open chords and steady strumming.`;
     }
 
     return { strengths, weaknesses, vibeRecommendation };

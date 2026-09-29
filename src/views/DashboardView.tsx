@@ -202,7 +202,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
             {SKILL_CATEGORIES_METADATA.map((cat) => {
               const score = skillProfile[cat.key];
-              const percent = (score / 10) * 100;
+              const percent = score !== null ? (score / 10) * 100 : 0;
 
               return (
                 <div

@@ -124,3 +124,23 @@ export interface GuitarSongItem {
   description: string;
   isUnlocked: boolean;
 }
+
+export interface PracticeSessionRecord {
+  id: string;
+  exerciseName: string;
+  category: 'Technique' | 'Chords' | 'Rhythm' | 'Speed Lab' | 'Songs' | 'Free Play';
+  durationMinutes: number;
+  bpm?: number;
+  cleanRepetitions?: number;
+  timestamp: string;
+}
+
+export interface AchievementItem {
+  id: string;
+  title: string;
+  description: string;
+  isUnlocked: boolean;
+  unlockedDate?: string;
+  icon: string;
+}
+
